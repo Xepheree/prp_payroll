@@ -1,17 +1,23 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
-    BookOpen,
-    FolderGit2,
+    Banknote,
+    Building2,
+    BusFront,
+    Clipboard,
     HandCoins,
     LayoutGrid,
     PhilippinePeso,
+    PiggyBank,
     Truck,
     User,
+    Warehouse,
 } from 'lucide-react';
+
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
+
 import {
     Sidebar,
     SidebarContent,
@@ -21,51 +27,82 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+
 import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-    {
-        title: 'Employee Masterlist',
-        href: '/employees',
-        icon: User,
-    },
-    {
-        title: 'Trips',
-        href: '/trips',
-        icon: Truck,
-    },
-    {
-        title: 'Outstanding Balances',
-        href: '/obs',
-        icon: HandCoins,
-    },
-    {
-        title: 'Payroll',
-        href: '/payroll',
-        icon: PhilippinePeso,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
+    const { auth } = usePage().props as any;
+
+    const isAdmin =
+        auth.user.role === 'admin' || auth.user.role === 'superadmin';
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+
+        ...(isAdmin
+            ? [
+                  {
+                      title: 'Employee Masterlist',
+                      href: '/employees',
+                      icon: User,
+                  },
+                  {
+                      title: 'Trips',
+                      href: '/trips',
+                      icon: Truck,
+                  },
+                  {
+                      title: 'Outstanding Balances',
+                      href: '/obs',
+                      icon: HandCoins,
+                  },
+                  {
+                      title: 'Payroll',
+                      href: '/payroll',
+                      icon: PhilippinePeso,
+                  },
+                  {
+                      title: 'Billings',
+                      href: '/billings',
+                      icon: Clipboard,
+                  },
+                  {
+                      title: 'Inventory',
+                      href: '/inventory',
+                      icon: Warehouse,
+                  },
+                  {
+                      title: 'Cash Flow',
+                      href: '/cash-flow',
+                      icon: Banknote,
+                  },
+              ]
+            : []),
+    ];
+
+    const footerNavItems: NavItem[] = [
+        {
+            title: 'Available Trucks',
+            href: '/trucks',
+            icon: BusFront,
+        },
+        {
+            title: 'Companies',
+            href: '/companies',
+            icon: Building2,
+        },
+        {
+            title: 'Budget',
+            href: '/budget',
+            icon: PiggyBank,
+        },
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

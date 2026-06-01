@@ -44,7 +44,7 @@ export default function Welcome() {
                                     <h1 className="text-5xl font-bold tracking-wider">
                                         PRP 413
                                     </h1>
-                                    <h2 className="text-2xl font-bold tracking-tight text-[#1b1b18] dark:text-white">
+                                    <h2 className="text-2xl font-normal tracking-tight text-[#1b1b18] dark:text-white">
                                         Logistic Services
                                     </h2>
 

@@ -1,6 +1,8 @@
+import { usePage } from '@inertiajs/react';
 import AppLogoIcon from '@/components/app-logo-icon';
 
 export default function AppLogo() {
+    const { auth } = usePage().props as any;
     return (
         <>
             <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
@@ -10,6 +12,7 @@ export default function AppLogo() {
                 <span className="mb-0.5 truncate leading-tight font-semibold">
                     PRP 413 Logistics
                 </span>
+                <span className="text-xs capitalize">{auth.user.role}</span>
             </div>
         </>
     );
