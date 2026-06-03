@@ -20,16 +20,6 @@ class EmployeeController extends Controller
         return Inertia::render('employees/create', []);
     }
 
-    // public function store(Request $request)
-    // {
-    //     dd(
-    //         $request->all(),
-    //         $request->file('image'),
-    //         $request->hasFile('image'),
-    //         $request->file('image')?->getError()
-    //     );
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -60,5 +50,11 @@ class EmployeeController extends Controller
             'description' => $request->description,
         ]);
         return redirect()->route('employees.index')->with('message', 'Employee added successfully.');
+    }
+
+    public function destroy(Employee $id)
+    {
+        $id->delete();
+        return redirect()->route('employees.index')->with('message', 'Employee removed successfully.');
     }
 }

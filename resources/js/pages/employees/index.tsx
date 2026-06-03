@@ -1,11 +1,13 @@
-import { Head, usePage } from '@inertiajs/react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Plus, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import DeleteConfirmationDialog from '@/components/custom/modals/DeleteConfirmationDialog';
 import CreateEmployeeModal from '@/components/custom/modals/employees/CreateEmployeeModal';
 import ViewEmployeeModal from '@/components/custom/modals/employees/ViewEmployeeModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -51,9 +53,23 @@ export default function Index() {
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [open, setOpen] = useState(false);
 
-    const handleRowClick = (truck) => {
-        setSelectedEmployee(truck);
+    const handleRowClick = (employee) => {
+        setSelectedEmployee(employee);
         setOpen(true);
+    };
+
+    const { processing, delete: destroy } = useForm();
+
+    const handleDelete = (id: number, name: string) => {
+        destroy(`/employees/${id}`, {
+            onSuccess: () => {
+                toast.success(`${name} was removed successfully.`);
+            },
+
+            onError: () => {
+                toast.error(`Failed to remove ${name}.`);
+            },
+        });
     };
 
     const [openCreate, setOpenCreate] = useState(false);
@@ -107,9 +123,10 @@ export default function Index() {
                                         <TableRow
                                             key={employee.id}
                                             className="cursor-pointer"
-                                            onClick={() =>
-                                                handleRowClick(employee)
-                                            }
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleRowClick(employee);
+                                            }}
                                         >
                                             <TableCell>{index + 1}</TableCell>
                                             <TableCell className="font-medium">
@@ -158,12 +175,17 @@ export default function Index() {
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
 
-                                                    <Button
-                                                        size="icon"
-                                                        variant="destructive"
-                                                    >
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
+                                                    <DeleteConfirmationDialog
+                                                        title="Delete Employee?"
+                                                        description={`This will permanently remove ${employee.name}. This action cannot be undone.`}
+                                                        processing={processing}
+                                                        onConfirm={() =>
+                                                            handleDelete(
+                                                                employee.id,
+                                                                employee.name,
+                                                            )
+                                                        }
+                                                    />
                                                 </div>
                                             </TableCell>
                                         </TableRow>

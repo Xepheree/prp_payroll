@@ -27,6 +27,8 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
     Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
+    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
+
 
     // Trips
     Route::get('/trips', [TripController::class, 'index'])->name('trips.index');
