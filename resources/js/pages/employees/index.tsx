@@ -1,10 +1,11 @@
-import { Head, Link, usePage } from '@inertiajs/react';
-import { ArchiveX, Check } from 'lucide-react';
+import { Head, usePage } from '@inertiajs/react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-
+import CreateEmployeeModal from '@/components/custom/modals/employees/CreateEmployeeModal';
+import ViewEmployeeModal from '@/components/custom/modals/employees/ViewEmployeeModal';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 import {
     Table,
     TableBody,
@@ -13,89 +14,224 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function Index() {
+    // dummy data
+    // const employees = [
+    //     {
+    //         id: 1,
+    //         image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
+    //         name: 'Juan Dela Cruz',
+    //         designation: 'Driver',
+    //         rate: 850,
+    //         ot_rate: 120,
+    //         status: 'active',
+    //     },
+    //     {
+    //         id: 2,
+    //         image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
+    //         name: 'Maria Santos',
+    //         designation: 'Dispatcher',
+    //         rate: 950,
+    //         ot_rate: 140,
+    //         status: 'active',
+    //     },
+    //     {
+    //         id: 3,
+    //         image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
+    //         name: 'Pedro Reyes',
+    //         designation: 'Helper',
+    //         rate: 650,
+    //         ot_rate: 100,
+    //         status: 'inactive',
+    //     },
+    // ];
+
     const { employees, flash } = usePage().props as PageProps;
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [open, setOpen] = useState(false);
+
+    const handleRowClick = (truck) => {
+        setSelectedEmployee(truck);
+        setOpen(true);
+    };
+
+    const [openCreate, setOpenCreate] = useState(false);
 
     return (
         <>
             <Head title="Employees" />
 
-            <div className="m-4">
-                {flash?.message && (
-                    <div className="m-4">
-                        <Alert>
-                            <Check className="h-4 w-4" />
-                            <AlertTitle>Notification</AlertTitle>
-                            <AlertDescription>{flash.message}</AlertDescription>
-                        </Alert>
+            <div className="space-y-6 p-6">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold">
+                            Employee Masterlist
+                        </h1>
+                        <p className="text-muted-foreground">
+                            Manage Employees.
+                        </p>
                     </div>
-                )}
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle>Employee Masterlist</CardTitle>
 
-                        <Link href="/employees/create">
-                            <Button>Add Employee</Button>
-                        </Link>
-                    </CardHeader>
+                    <Button onClick={() => setOpenCreate(true)}>
+                        <Plus className="mr-2 h-4 w-4" />
+                        Add Employee
+                    </Button>
+                </div>
+
+                <Card>
+                    {/* <CardHeader>
+                        <CardTitle></CardTitle>
+                    </CardHeader> */}
 
                     <CardContent>
-                        {employees.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center space-y-4 py-16 text-center">
-                                <ArchiveX className="size-8 text-muted-foreground" />
-                                <p className="text-muted-foreground">
-                                    No employees found.
-                                </p>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>#</TableHead>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Designation</TableHead>
+                                    <TableHead>Rate</TableHead>
+                                    <TableHead>OT Rate</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead className="w-[150px]">
+                                        Actions
+                                    </TableHead>
+                                </TableRow>
+                            </TableHeader>
 
-                                <Link href="/employees/create">
-                                    <Button>Add an Employee</Button>
-                                </Link>
-                            </div>
-                        ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Name</TableHead>
-
-                                        <TableHead>Designation</TableHead>
-
-                                        <TableHead>Monthly Rate</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-
-                                <TableBody>
-                                    {employees.map((employee) => (
-                                        <TableRow key={employee.id}>
+                            <TableBody>
+                                {[...employees]
+                                    .sort((a, b) => b.id - a.id)
+                                    .map((employee, index) => (
+                                        <TableRow
+                                            key={employee.id}
+                                            className="cursor-pointer"
+                                            onClick={() =>
+                                                handleRowClick(employee)
+                                            }
+                                        >
+                                            <TableCell>{index + 1}</TableCell>
                                             <TableCell className="font-medium">
-                                                {employee.name}
+                                                <div className="flex items-center gap-3">
+                                                    <img
+                                                        src={
+                                                            employee.image
+                                                                ? `/storage/${employee.image}`
+                                                                : '/storage/employees/employee_placeholder.png'
+                                                        }
+                                                        alt={employee.name}
+                                                        className="h-10 w-10 rounded-md border object-cover"
+                                                    />
+                                                    <span>{employee.name}</span>
+                                                </div>
                                             </TableCell>
 
                                             <TableCell>
-                                                {employee.designation}
+                                                {getEmployeeDesignationBadge(
+                                                    employee.designation,
+                                                )}
                                             </TableCell>
 
                                             <TableCell>
                                                 ₱
                                                 {employee.rate.toLocaleString()}
                                             </TableCell>
+
+                                            <TableCell>
+                                                ₱
+                                                {employee.ot_rate.toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell>
+                                                {getEmployeeStatusBadge(
+                                                    employee.status,
+                                                )}
+                                            </TableCell>
+
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        size="icon"
+                                                        variant="outline"
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+
+                                                    <Button
+                                                        size="icon"
+                                                        variant="destructive"
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
                                         </TableRow>
                                     ))}
-                                </TableBody>
-                            </Table>
-                        )}
+                            </TableBody>
+                        </Table>
                     </CardContent>
                 </Card>
             </div>
+
+            <ViewEmployeeModal
+                open={open}
+                setOpen={setOpen}
+                selectedEmployee={selectedEmployee}
+            />
+
+            <CreateEmployeeModal
+                openCreate={openCreate}
+                setOpenCreate={setOpenCreate}
+            />
         </>
     );
 }
 
+export const getEmployeeStatusBadge = (status) => {
+    switch (status) {
+        case 'active':
+            return (
+                <Badge className="bg-green-500 hover:bg-green-600">
+                    Active
+                </Badge>
+            );
+
+        case 'inactive':
+            return <Badge variant="destructive">Inactive</Badge>;
+
+        default:
+            return <Badge variant="secondary">{status}</Badge>;
+    }
+};
+
+const designationColors = {
+    driver: 'bg-blue-500 hover:bg-blue-600',
+    helper: 'bg-green-500 hover:bg-green-600',
+    cutter: 'bg-red-500 hover:bg-red-600',
+    checker: 'bg-purple-500 hover:bg-purple-600',
+    dispatcher: 'bg-orange-500 hover:bg-orange-600',
+    sorter: 'bg-cyan-500 hover:bg-cyan-600',
+    presser: 'bg-pink-500 hover:bg-pink-600',
+    guard: 'bg-slate-600 hover:bg-slate-700',
+    hr: 'bg-emerald-500 hover:bg-emerald-600',
+    finance: 'bg-yellow-500 hover:bg-yellow-600',
+};
+
+export const getEmployeeDesignationBadge = (designation) => (
+    <Badge
+        className={
+            designationColors[designation?.toLowerCase()] || 'bg-secondary'
+        }
+    >
+        {designation}
+    </Badge>
+);
+
 Index.layout = {
     breadcrumbs: [
         {
-            title: 'Employee Masterlist',
+            title: 'Employees',
             href: '/employees',
         },
     ],

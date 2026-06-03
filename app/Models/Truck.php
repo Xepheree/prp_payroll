@@ -4,15 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Employee extends Model
+class Truck extends Model
 {
     protected $fillable = [
         'image',
-        'name',
-        'designation',
-        'rate',
-        'ot_rate',
+        'plate',
+        'alias',
+        'make',
+        'category',
         'status',
-        'description',
     ];
 }

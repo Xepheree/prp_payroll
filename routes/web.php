@@ -42,9 +42,11 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // Trucks
     Route::get('/trucks', [TrucksController::class, 'index'])->name('trucks.index');
+    Route::post('/trucks', [TrucksController::class, 'store'])->name('trucks.store');
 
     // Companies
     Route::get('/companies', [CompaniesController::class, 'index'])->name('companies.index');
+    Route::post('/companies', [CompaniesController::class, 'store'])->name('companies.store');
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');

@@ -13,10 +13,24 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
+
+            $table->string('image')->nullable();
+
             $table->string('name');
+
             $table->string('designation');
+
             $table->decimal('rate', 10, 2);
+
+            $table->decimal('ot_rate', 10, 2)->default(0);
+
+            $table->enum('status', [
+                'active',
+                'inactive',
+            ])->default('active');
+
             $table->text('description')->nullable();
+
             $table->timestamps();
         });
     }
