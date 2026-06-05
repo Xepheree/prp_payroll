@@ -25,7 +25,6 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // Employees
     Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
-    Route::get('/employees/create', [EmployeeController::class, 'create'])->name('employees.create');
     Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
     Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
 
@@ -45,10 +44,12 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     // Trucks
     Route::get('/trucks', [TrucksController::class, 'index'])->name('trucks.index');
     Route::post('/trucks', [TrucksController::class, 'store'])->name('trucks.store');
+    Route::delete('/trucks/{id}', [TrucksController::class, 'destroy'])->name('trucks.destroy');
 
     // Companies
     Route::get('/companies', [CompaniesController::class, 'index'])->name('companies.index');
     Route::post('/companies', [CompaniesController::class, 'store'])->name('companies.store');
+    Route::delete('/companies/{id}', [CompaniesController::class, 'destroy'])->name('companies.destroy');
 
     // Inventory
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');

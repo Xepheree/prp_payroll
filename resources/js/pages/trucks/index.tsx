@@ -1,11 +1,12 @@
-import { Head, usePage } from '@inertiajs/react';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Plus, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import DeleteConfirmationDialog from '@/components/custom/modals/DeleteConfirmationDialog';
 import CreateTruckModal from '@/components/custom/modals/trucks/CreateTruckModal';
 import ViewTruckModal from '@/components/custom/modals/trucks/ViewTruckModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -14,6 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { toast } from 'sonner';
 
 export default function Index() {
     const { trucks, flash } = usePage().props as PageProps;
@@ -26,6 +28,19 @@ export default function Index() {
         setOpen(true);
     };
 
+    const { processing, delete: destroy } = useForm();
+
+    const handleDelete = (id: number, plate: string) => {
+        destroy(`/trucks/${id}`, {
+            onSuccess: () => {
+                toast.success(`${plate} was removed successfully.`);
+            },
+
+            onError: () => {
+                toast.error(`Failed to remove ${plate}.`);
+            },
+        });
+    };
     const [openCreate, setOpenCreate] = useState(false);
 
     return (
@@ -112,12 +127,17 @@ export default function Index() {
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
 
-                                                <Button
-                                                    size="icon"
-                                                    variant="destructive"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                                <DeleteConfirmationDialog
+                                                    title="Delete Truck?"
+                                                    description={`This will permanently remove ${truck.name}. This action cannot be undone.`}
+                                                    processing={processing}
+                                                    onConfirm={() =>
+                                                        handleDelete(
+                                                            truck.id,
+                                                            truck.plate,
+                                                        )
+                                                    }
+                                                />
                                             </div>
                                         </TableCell>
                                     </TableRow>

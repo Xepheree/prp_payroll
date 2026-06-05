@@ -60,4 +60,10 @@ class CompaniesController extends Controller
             ->route('companies.index')
             ->with('message', 'Company added successfully.');
     }
+
+    public function destroy(Company $id)
+    {
+        $id->delete();
+        return redirect()->route('companies.index')->with('message', 'Company removed successfully.');
+    }
 }

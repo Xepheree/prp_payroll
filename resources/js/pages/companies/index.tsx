@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import CreateCompanyModal from '@/components/custom/modals/companies/CreateCompanyModal';
@@ -13,6 +13,8 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import DeleteConfirmationDialog from '@/components/custom/modals/DeleteConfirmationDialog';
+import { toast } from 'sonner';
 
 export default function Index() {
     const { companies, flash } = usePage().props as PageProps;
@@ -24,6 +26,20 @@ export default function Index() {
     const handleRowClick = (company) => {
         setSelectedCompany(company);
         setOpen(true);
+    };
+
+    const { processing, delete: destroy } = useForm();
+
+    const handleDelete = (id: number, name: string) => {
+        destroy(`/companies/${id}`, {
+            onSuccess: () => {
+                toast.success(`${name} was removed successfully.`);
+            },
+
+            onError: () => {
+                toast.error(`Failed to remove ${name}.`);
+            },
+        });
     };
 
     return (
@@ -71,7 +87,7 @@ export default function Index() {
                                                     src={
                                                         company.image
                                                             ? `/storage/${company.image}`
-                                                            : '/storage/companies/company_placeholder.png'
+                                                            : '/storage/placeholder.jpg'
                                                     }
                                                     alt={company.name}
                                                     className="h-10 w-10 rounded-md border object-cover"
@@ -102,12 +118,17 @@ export default function Index() {
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
 
-                                                <Button
-                                                    size="icon"
-                                                    variant="destructive"
-                                                >
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                                <DeleteConfirmationDialog
+                                                    title="Delete Employee?"
+                                                    description={`This will permanently remove ${company.name}. This action cannot be undone.`}
+                                                    processing={processing}
+                                                    onConfirm={() =>
+                                                        handleDelete(
+                                                            company.id,
+                                                            company.name,
+                                                        )
+                                                    }
+                                                />
                                             </div>
                                         </TableCell>
                                     </TableRow>
