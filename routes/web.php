@@ -24,41 +24,34 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // Employees
-    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
-    Route::post('/employees', [EmployeeController::class, 'store'])->name('employees.store');
-    Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('employees.destroy');
-
+    Route::resource('employees', EmployeeController::class);
 
     // Trips
-    Route::get('/trips', [TripController::class, 'index'])->name('trips.index');
+    Route::resource('trips', TripController::class);
 
     // Outstanding
-    Route::get('/obs', [OBController::class, 'index'])->name('obs.index');
+    Route::resource('obs', OBController::class);
 
     // Payroll
-    Route::get('/payroll', [PayrollController::class, 'index'])->name('payroll.index');
+    Route::resource('payroll', PayrollController::class);
 
     // Billings
-    Route::get('/billings', [BillingsController::class, 'index'])->name('billings.index');
+    Route::resource('billings', BillingsController::class);
 
     // Trucks
-    Route::get('/trucks', [TrucksController::class, 'index'])->name('trucks.index');
-    Route::post('/trucks', [TrucksController::class, 'store'])->name('trucks.store');
-    Route::delete('/trucks/{id}', [TrucksController::class, 'destroy'])->name('trucks.destroy');
+    Route::resource('trucks', TrucksController::class);
 
     // Companies
-    Route::get('/companies', [CompaniesController::class, 'index'])->name('companies.index');
-    Route::post('/companies', [CompaniesController::class, 'store'])->name('companies.store');
-    Route::delete('/companies/{id}', [CompaniesController::class, 'destroy'])->name('companies.destroy');
+    Route::resource('companies', CompaniesController::class);
 
     // Inventory
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    Route::resource('inventory', InventoryController::class);
 
     // Cash Flow
-    Route::get('/cash-flow', [CashFlowController::class, 'index'])->name('cash-flow.index');
+    Route::resource('cash-flow', CashFlowController::class);
 
     // Budget
-    Route::get('/budget', [BudgetController::class, 'index'])->name('budget.index');
+    Route::resource('budget', BudgetController::class);
 });
 
 require __DIR__ . '/settings.php';

@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,12 +22,14 @@ import {
 function CreateEmployeeModal({
     openCreate,
     setOpenCreate,
+    employee = null,
 }: {
     openCreate: boolean;
     setOpenCreate: any;
 }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
-
+    const [imagePreview, setImagePreview] = useState('');
+    const isEditing = !!employee;
     const [form, setForm] = useState<{
         image: File | null;
         name: string;
@@ -75,32 +77,69 @@ function CreateEmployeeModal({
             data.append('image', form.image);
         }
 
-        router.post('/employees', data, {
-            forceFormData: true,
+        if (isEditing) {
+            data.append('_method', 'PUT');
 
-            onSuccess: () => {
-                toast.success('Employee created successfully');
-                resetState();
-                setOpenCreate(false);
-            },
+            router.post(`/employees/${employee.id}`, data, {
+                forceFormData: true,
+                onSuccess: () => {
+                    toast.success('Employee updated successfully');
+                    resetState();
+                    setOpenCreate(false);
+                },
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
 
-            onError: (errors) => {
-                const firstError = Object.values(errors)[0];
+                    if (firstError) {
+                        toast.error(firstError);
+                    }
+                },
+            });
+        } else {
+            router.post('/employees', data, {
+                forceFormData: true,
+                onSuccess: () => {
+                    toast.success('Employee created successfully');
+                    resetState();
+                    setOpenCreate(false);
+                },
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
 
-                if (firstError) {
-                    toast.error(firstError);
-                }
-            },
-        });
+                    if (firstError) {
+                        toast.error(firstError);
+                    }
+                },
+            });
+        }
     };
 
-    const [imagePreview, setImagePreview] = useState('');
+    useEffect(() => {
+        if (employee) {
+            setForm({
+                image: null,
+                name: employee.name || '',
+                designation: employee.designation || '',
+                rate: employee.rate || '',
+                ot_rate: employee.ot_rate || '',
+                status: employee.status || 'active',
+            });
+
+            setImagePreview(employee.image ? `/storage/${employee.image}` : '');
+        } else {
+            resetState();
+        }
+    }, [employee]);
 
     return (
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
             <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-xl">
                 <DialogHeader>
-                    <DialogTitle>Add Employee</DialogTitle>
+                    <DialogTitle>
+                        <DialogTitle>
+                            {isEditing ? 'Edit Employee' : 'Add Employee'}
+                        </DialogTitle>
+                    </DialogTitle>
                 </DialogHeader>
 
                 <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4">
@@ -263,7 +302,9 @@ function CreateEmployeeModal({
                     >
                         Save Employee
                     </Button> */}
-                    <Button onClick={submit}>Save Employee</Button>
+                    <Button onClick={submit}>
+                        {isEditing ? 'Update Employee' : 'Save Employee'}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

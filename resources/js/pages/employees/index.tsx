@@ -73,6 +73,7 @@ export default function Index() {
     };
 
     const [openCreate, setOpenCreate] = useState(false);
+    const [editingEmployee, setEditingEmployee] = useState(null);
 
     return (
         <>
@@ -89,7 +90,12 @@ export default function Index() {
                         </p>
                     </div>
 
-                    <Button onClick={() => setOpenCreate(true)}>
+                    <Button
+                        onClick={() => {
+                            setEditingEmployee(null);
+                            setOpenCreate(true);
+                        }}
+                    >
                         <Plus className="mr-2 h-4 w-4" />
                         Add Employee
                     </Button>
@@ -171,6 +177,14 @@ export default function Index() {
                                                     <Button
                                                         size="icon"
                                                         variant="outline"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+
+                                                            setEditingEmployee(
+                                                                employee,
+                                                            );
+                                                            setOpenCreate(true);
+                                                        }}
                                                     >
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
@@ -204,7 +218,14 @@ export default function Index() {
 
             <CreateEmployeeModal
                 openCreate={openCreate}
-                setOpenCreate={setOpenCreate}
+                setOpenCreate={(open) => {
+                    setOpenCreate(open);
+
+                    if (!open) {
+                        setEditingEmployee(null);
+                    }
+                }}
+                employee={editingEmployee}
             />
         </>
     );

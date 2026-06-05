@@ -45,9 +45,9 @@ class TrucksController extends Controller
         return redirect()->route('trucks.index')->with('message', 'Truck added successfully.');
     }
 
-    public function destroy(Truck $id)
+    public function destroy(Truck $truck)
     {
-        $id->delete();
+        $truck->delete();
         return redirect()->route('trucks.index')->with('message', 'Truck removed successfully.');
     }
 }
