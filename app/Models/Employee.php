@@ -25,4 +25,9 @@ class Employee extends Model
     {
         return $this->hasMany(Trip::class, 'helper_id');
     }
+
+    public function payrollItems()
+    {
+        return $this->hasMany(PayrollItem::class);
+    }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BillingsController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CashFlowController;
@@ -52,6 +53,9 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // Budget
     Route::resource('budget', BudgetController::class);
+
+    // Attendance
+    Route::resource('attendance', AttendanceController::class);
 });
 
 require __DIR__ . '/settings.php';

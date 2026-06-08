@@ -3,6 +3,7 @@ import {
     Banknote,
     Building2,
     BusFront,
+    CalendarCheck,
     Clipboard,
     HandCoins,
     LayoutGrid,
@@ -86,6 +87,11 @@ export function AppSidebar() {
     ];
 
     const footerNavItems: NavItem[] = [
+        {
+            title: 'Attendance',
+            href: '/attendance',
+            icon: CalendarCheck,
+        },
         {
             title: 'Available Trucks',
             href: '/trucks',
