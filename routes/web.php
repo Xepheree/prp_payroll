@@ -31,7 +31,14 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     Route::resource('trips', TripController::class);
 
     // Outstanding
-    Route::resource('obs', OBController::class);
+    // Route::resource('obs', OBController::class);
+    Route::get('/obs', [OBController::class, 'index'])
+        ->name('obs.index');
+
+    Route::patch(
+        '/obs/{employee}',
+        [OBController::class, 'update']
+    )->name('obs.update');
 
     // Payroll
     Route::resource('payroll', PayrollController::class);

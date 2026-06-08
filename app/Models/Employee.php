@@ -14,6 +14,8 @@ class Employee extends Model
         'ot_rate',
         'status',
         'description',
+        'balance',
+        'trip_rate',
     ];
 
     public function drivenTrips()
