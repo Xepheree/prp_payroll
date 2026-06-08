@@ -1,6 +1,7 @@
 // resources/js/components/custom/EmptyState.tsx
 
 import { Button } from '@/components/ui/button';
+import { PackageOpen } from 'lucide-react';
 
 interface EmptyStateProps {
     title: string;
@@ -17,7 +18,9 @@ export default function EmptyState({
 }: EmptyStateProps) {
     return (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-4 rounded-full border p-6">📂</div>
+            <div className="mb-4 rounded-full border p-6">
+                <PackageOpen className="h-13 w-13" strokeWidth={1} />
+            </div>
 
             <h3 className="text-xl font-semibold">{title}</h3>
 

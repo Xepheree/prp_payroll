@@ -15,4 +15,14 @@ class Employee extends Model
         'status',
         'description',
     ];
+
+    public function drivenTrips()
+    {
+        return $this->hasMany(Trip::class, 'driver_id');
+    }
+
+    public function assistedTrips()
+    {
+        return $this->hasMany(Trip::class, 'helper_id');
+    }
 }

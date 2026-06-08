@@ -14,4 +14,9 @@ class Truck extends Model
         'category',
         'status',
     ];
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
 }
