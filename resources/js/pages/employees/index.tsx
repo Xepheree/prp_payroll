@@ -16,6 +16,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import EmptyState from '@/components/custom/EmptyState';
 
 export default function Index() {
     // dummy data
@@ -89,16 +90,17 @@ export default function Index() {
                             Manage Employees.
                         </p>
                     </div>
-
-                    <Button
-                        onClick={() => {
-                            setEditingEmployee(null);
-                            setOpenCreate(true);
-                        }}
-                    >
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Employee
-                    </Button>
+                    {employees.length !== 0 && (
+                        <Button
+                            onClick={() => {
+                                setEditingEmployee(null);
+                                setOpenCreate(true);
+                            }}
+                        >
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Employee
+                        </Button>
+                    )}
                 </div>
 
                 <Card>
@@ -107,105 +109,122 @@ export default function Index() {
                     </CardHeader> */}
 
                     <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>#</TableHead>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Designation</TableHead>
-                                    <TableHead>Rate</TableHead>
-                                    <TableHead>OT Rate</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="w-[150px]">
-                                        Actions
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
+                        {employees.length === 0 ? (
+                            <EmptyState
+                                title="No Employees Registered"
+                                description="Register employees to get started."
+                                actionLabel="Add Employee"
+                                onAction={() => setOpenCreate(true)}
+                            />
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>#</TableHead>
+                                        <TableHead>Name</TableHead>
+                                        <TableHead>Designation</TableHead>
+                                        <TableHead>Rate</TableHead>
+                                        <TableHead>OT Rate</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead className="w-[150px]">
+                                            Actions
+                                        </TableHead>
+                                    </TableRow>
+                                </TableHeader>
 
-                            <TableBody>
-                                {[...employees]
-                                    .sort((a, b) => b.id - a.id)
-                                    .map((employee, index) => (
-                                        <TableRow
-                                            key={employee.id}
-                                            className="cursor-pointer"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRowClick(employee);
-                                            }}
-                                        >
-                                            <TableCell>{index + 1}</TableCell>
-                                            <TableCell className="font-medium">
-                                                <div className="flex items-center gap-3">
-                                                    <img
-                                                        src={
-                                                            employee.image
-                                                                ? `/storage/${employee.image}`
-                                                                : '/storage/employees/employee_placeholder.png'
-                                                        }
-                                                        alt={employee.name}
-                                                        className="h-10 w-10 rounded-md border object-cover"
-                                                    />
-                                                    <span>{employee.name}</span>
-                                                </div>
-                                            </TableCell>
+                                <TableBody>
+                                    {[...employees]
+                                        .sort((a, b) => b.id - a.id)
+                                        .map((employee, index) => (
+                                            <TableRow
+                                                key={employee.id}
+                                                className="cursor-pointer"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRowClick(employee);
+                                                }}
+                                            >
+                                                <TableCell>
+                                                    {index + 1}
+                                                </TableCell>
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center gap-3">
+                                                        <img
+                                                            src={
+                                                                employee.image
+                                                                    ? `/storage/${employee.image}`
+                                                                    : '/storage/employees/employee_placeholder.png'
+                                                            }
+                                                            alt={employee.name}
+                                                            className="h-10 w-10 rounded-md border object-cover"
+                                                        />
+                                                        <span>
+                                                            {employee.name}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
 
-                                            <TableCell>
-                                                {getEmployeeDesignationBadge(
-                                                    employee.designation,
-                                                )}
-                                            </TableCell>
+                                                <TableCell>
+                                                    {getEmployeeDesignationBadge(
+                                                        employee.designation,
+                                                    )}
+                                                </TableCell>
 
-                                            <TableCell>
-                                                ₱
-                                                {employee.rate.toLocaleString()}
-                                            </TableCell>
+                                                <TableCell>
+                                                    ₱
+                                                    {employee.rate.toLocaleString()}
+                                                </TableCell>
 
-                                            <TableCell>
-                                                ₱
-                                                {employee.ot_rate.toLocaleString()}
-                                            </TableCell>
+                                                <TableCell>
+                                                    ₱
+                                                    {employee.ot_rate.toLocaleString()}
+                                                </TableCell>
 
-                                            <TableCell>
-                                                {getEmployeeStatusBadge(
-                                                    employee.status,
-                                                )}
-                                            </TableCell>
+                                                <TableCell>
+                                                    {getEmployeeStatusBadge(
+                                                        employee.status,
+                                                    )}
+                                                </TableCell>
 
-                                            <TableCell>
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        size="icon"
-                                                        variant="outline"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
+                                                <TableCell>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            size="icon"
+                                                            variant="outline"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
 
-                                                            setEditingEmployee(
-                                                                employee,
-                                                            );
-                                                            setOpenCreate(true);
-                                                        }}
-                                                    >
-                                                        <Pencil className="h-4 w-4" />
-                                                    </Button>
+                                                                setEditingEmployee(
+                                                                    employee,
+                                                                );
+                                                                setOpenCreate(
+                                                                    true,
+                                                                );
+                                                            }}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
 
-                                                    <DeleteConfirmationDialog
-                                                        title="Delete Employee?"
-                                                        description={`This will permanently remove ${employee.name}. This action cannot be undone.`}
-                                                        processing={processing}
-                                                        onConfirm={() =>
-                                                            handleDelete(
-                                                                employee.id,
-                                                                employee.name,
-                                                            )
-                                                        }
-                                                    />
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                            </TableBody>
-                        </Table>
+                                                        <DeleteConfirmationDialog
+                                                            title="Delete Employee?"
+                                                            description={`This will permanently remove ${employee.name}. This action cannot be undone.`}
+                                                            processing={
+                                                                processing
+                                                            }
+                                                            onConfirm={() =>
+                                                                handleDelete(
+                                                                    employee.id,
+                                                                    employee.name,
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        )}
                     </CardContent>
                 </Card>
             </div>

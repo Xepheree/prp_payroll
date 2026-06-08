@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CompaniesController extends Controller
@@ -63,7 +64,17 @@ class CompaniesController extends Controller
 
     public function destroy(Company $company)
     {
-        $company->delete();
-        return redirect()->route('companies.index')->with('message', 'Company removed successfully.');
+        if (
+            $company->image &&
+            basename($company->image) !== 'company_placeholder.png' // protect the placeholder image
+        ) {
+            Storage::disk('public')->delete($company->image);
+        } // delete image upon deleting record
+
+        $company->delete(); // before deleting record
+
+        return redirect()
+            ->route('companies.index')
+            ->with('message', 'Company removed successfully.');
     }
 }

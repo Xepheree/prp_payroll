@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { Plus, Pencil } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import DeleteConfirmationDialog from '@/components/custom/modals/DeleteConfirmationDialog';
 import CreateTruckModal from '@/components/custom/modals/trucks/CreateTruckModal';
 import ViewTruckModal from '@/components/custom/modals/trucks/ViewTruckModal';
@@ -15,7 +16,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { toast } from 'sonner';
+import EmptyState from '@/components/custom/EmptyState';
 
 export default function Index() {
     const { trucks, flash } = usePage().props as PageProps;
@@ -56,10 +57,12 @@ export default function Index() {
                         </p>
                     </div>
 
-                    <Button onClick={() => setOpenCreate(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Add Truck
-                    </Button>
+                    {trucks.length !== 0 && (
+                        <Button onClick={() => setOpenCreate(true)}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Add Truck
+                        </Button>
+                    )}
                 </div>
 
                 <Card>
@@ -68,82 +71,108 @@ export default function Index() {
                     </CardHeader> */}
 
                     <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Plate Number</TableHead>
-                                    <TableHead>Alias</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead>Make</TableHead>
-                                    <TableHead>Category</TableHead>
-                                    <TableHead className="w-[150px]">
-                                        Actions
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-
-                            <TableBody>
-                                {trucks.map((truck) => (
-                                    <TableRow
-                                        key={truck.id}
-                                        className="cursor-pointer"
-                                        onClick={() => handleRowClick(truck)}
-                                    >
-                                        <TableCell className="font-medium">
-                                            <div className="flex items-center gap-3">
-                                                <img
-                                                    src={
-                                                        truck.image
-                                                            ? `/storage/${truck.image}`
-                                                            : '/storage/trucks/truck_placeholder.png'
-                                                    }
-                                                    alt={truck.plate}
-                                                    className="h-10 w-10 rounded-md border object-cover"
-                                                />
-                                                <span>{truck.plate}</span>
-                                            </div>
-                                        </TableCell>
-
-                                        <TableCell>{truck.alias}</TableCell>
-
-                                        <TableCell>
-                                            {getStatusBadge(truck.status)}
-                                        </TableCell>
-
-                                        <TableCell>{truck.make}</TableCell>
-
-                                        <TableCell>
-                                            <Badge variant="secondary">
-                                                {truck.category}
-                                            </Badge>
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    size="icon"
-                                                    variant="outline"
-                                                >
-                                                    <Pencil className="h-4 w-4" />
-                                                </Button>
-
-                                                <DeleteConfirmationDialog
-                                                    title="Delete Truck?"
-                                                    description={`This will permanently remove ${truck.name}. This action cannot be undone.`}
-                                                    processing={processing}
-                                                    onConfirm={() =>
-                                                        handleDelete(
-                                                            truck.id,
-                                                            truck.plate,
-                                                        )
-                                                    }
-                                                />
-                                            </div>
-                                        </TableCell>
+                        {trucks.length === 0 ? (
+                            <EmptyState
+                                title="No Trucks Registered"
+                                description="Register trucks to get started."
+                                actionLabel="Add Truck"
+                                onAction={() => setOpenCreate(true)}
+                            />
+                        ) : (
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Plate Number</TableHead>
+                                        <TableHead>Alias</TableHead>
+                                        <TableHead>Status</TableHead>
+                                        <TableHead>Make</TableHead>
+                                        <TableHead>Category</TableHead>
+                                        <TableHead className="w-[150px]">
+                                            Actions
+                                        </TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+
+                                <TableBody>
+                                    {[...trucks]
+                                        .sort((a, b) => b.id - a.id)
+                                        .map((truck) => (
+                                            <TableRow
+                                                key={truck.id}
+                                                className="cursor-pointer"
+                                                onClick={() =>
+                                                    handleRowClick(truck)
+                                                }
+                                            >
+                                                <TableCell className="font-medium">
+                                                    <div className="flex items-center gap-3">
+                                                        <img
+                                                            src={
+                                                                truck.image
+                                                                    ? `/storage/${truck.image}`
+                                                                    : '/storage/trucks/truck_placeholder.png'
+                                                            }
+                                                            alt={truck.plate}
+                                                            className="h-10 w-10 rounded-md border object-cover"
+                                                        />
+                                                        <span>
+                                                            {truck.plate}
+                                                        </span>
+                                                    </div>
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    {truck.alias}
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    {getStatusBadge(
+                                                        truck.status,
+                                                    )}
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    {truck.make}
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    <Badge variant="secondary">
+                                                        {truck.category}
+                                                    </Badge>
+                                                </TableCell>
+
+                                                <TableCell>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            size="icon"
+                                                            variant="outline"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                            }}
+                                                        >
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+
+                                                        <DeleteConfirmationDialog
+                                                            title="Delete Truck?"
+                                                            description={`This will permanently remove ${truck.plate}. This action cannot be undone.`}
+                                                            processing={
+                                                                processing
+                                                            }
+                                                            onConfirm={() =>
+                                                                handleDelete(
+                                                                    truck.id,
+                                                                    truck.plate,
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                        )}
                     </CardContent>
                 </Card>
             </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Truck;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class TrucksController extends Controller
@@ -47,7 +48,17 @@ class TrucksController extends Controller
 
     public function destroy(Truck $truck)
     {
-        $truck->delete();
-        return redirect()->route('trucks.index')->with('message', 'Truck removed successfully.');
+        if (
+            $truck->image &&
+            basename($truck->image) !== 'truck_placeholder.png' // protect the placeholder image
+        ) {
+            Storage::disk('public')->delete($truck->image);
+        } // delete image upon deleting record
+
+        $truck->delete(); // before deleting record
+
+        return redirect()
+            ->route('trucks.index')
+            ->with('message', 'Truck removed successfully.');
     }
 }
