@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -26,48 +26,89 @@ function CreateTripModal({
     setOpenCreate,
     employees,
     trucks,
+    trip = null,
 }: {
     openCreate: boolean;
     setOpenCreate: (open: boolean) => void;
     employees: any[];
     trucks: any[];
+    trip?: any;
 }) {
     const [form, setForm] = useState({
         trip_date: '',
         truck_id: '',
         driver_id: '',
-        helper_id: '',
+        helper_id: 'none',
         trip_type: '',
     });
+    const isEditing = !!trip;
 
     const resetState = () => {
         setForm({
             trip_date: '',
             truck_id: '',
             driver_id: '',
-            helper_id: '',
+            helper_id: 'none',
             trip_type: '',
         });
     };
 
     const submit = () => {
-        router.post('/trips', form, {
-            onSuccess: () => {
-                toast.success('Trip created successfully');
+        const payload = {
+            ...form,
+            helper_id: form.helper_id === 'none' ? null : form.helper_id,
+        };
 
-                resetState();
-                setOpenCreate(false);
-            },
+        if (isEditing) {
+            router.put(`/trips/${trip.id}`, form, {
+                onSuccess: () => {
+                    toast.success('Trip updated successfully');
 
-            onError: (errors) => {
-                const firstError = Object.values(errors)[0];
+                    resetState();
+                    setOpenCreate(false);
+                },
 
-                if (firstError) {
-                    toast.error(firstError as string);
-                }
-            },
-        });
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+
+                    if (firstError) {
+                        toast.error(firstError as string);
+                    }
+                },
+            });
+        } else {
+            router.post('/trips', payload, {
+                onSuccess: () => {
+                    toast.success('Trip created successfully');
+
+                    resetState();
+                    setOpenCreate(false);
+                },
+
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+
+                    if (firstError) {
+                        toast.error(firstError as string);
+                    }
+                },
+            });
+        }
     };
+
+    useEffect(() => {
+        if (trip) {
+            setForm({
+                trip_date: trip.trip_date ?? '',
+                truck_id: String(trip.truck_id ?? ''),
+                driver_id: String(trip.driver_id ?? ''),
+                helper_id: trip.helper_id ? String(trip.helper_id) : 'none',
+                trip_type: trip.trip_type ?? '',
+            });
+        } else {
+            resetState();
+        }
+    }, [trip]);
 
     return (
         <Dialog
@@ -82,7 +123,9 @@ function CreateTripModal({
         >
             <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-xl">
                 <DialogHeader>
-                    <DialogTitle>Create Trip</DialogTitle>
+                    <DialogTitle>
+                        {isEditing ? 'Edit Trip' : 'Create Trip'}
+                    </DialogTitle>
                 </DialogHeader>
 
                 <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4">
@@ -181,19 +224,16 @@ function CreateTripModal({
                             </SelectTrigger>
 
                             <SelectContent>
-                                {employees
-                                    // .filter(
-                                    //     (employee) =>
-                                    //         employee.designation === 'helper',
-                                    // )
-                                    .map((employee) => (
-                                        <SelectItem
-                                            key={employee.id}
-                                            value={String(employee.id)}
-                                        >
-                                            {employee.name}
-                                        </SelectItem>
-                                    ))}
+                                <SelectItem value="none">No Helper</SelectItem>
+
+                                {employees.map((employee) => (
+                                    <SelectItem
+                                        key={employee.id}
+                                        value={String(employee.id)}
+                                    >
+                                        {employee.name}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -235,7 +275,9 @@ function CreateTripModal({
                         Cancel
                     </Button>
 
-                    <Button onClick={submit}>Save Trip</Button>
+                    <Button onClick={submit}>
+                        {isEditing ? 'Update Trip' : 'Save Trip'}
+                    </Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

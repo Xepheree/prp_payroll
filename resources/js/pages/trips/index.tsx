@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 
@@ -16,11 +16,25 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import ViewTripModal from '@/components/custom/modals/trip/ViewTripModal';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 export default function Index() {
-    const { trips, employees, trucks, flash } = usePage().props as PageProps;
+    const { trips, filters, employees, trucks, flash } = usePage()
+        .props as PageProps;
+
+    const [dateFilters, setDateFilters] = useState({
+        start_date: filters?.start_date ?? '',
+        end_date: filters?.end_date ?? '',
+    });
 
     const [openCreate, setOpenCreate] = useState(false);
+
+    const [editingTrip, setEditingTrip] = useState(null);
+
+    const [openView, setOpenView] = useState(false);
+    const [selectedTrip, setSelectedTrip] = useState(null);
 
     return (
         <>
@@ -36,7 +50,12 @@ export default function Index() {
                         </p>
                     </div>
 
-                    <Button onClick={() => setOpenCreate(true)}>
+                    <Button
+                        onClick={() => {
+                            setEditingTrip(null);
+                            setOpenCreate(true);
+                        }}
+                    >
                         <Plus className="mr-2 h-4 w-4" />
                         New Trip
                     </Button>
@@ -45,6 +64,67 @@ export default function Index() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Trip Records</CardTitle>
+                        <div className="flex items-end gap-4">
+                            <div>
+                                <Label>From</Label>
+                                <Input
+                                    type="date"
+                                    value={dateFilters.start_date}
+                                    onChange={(e) =>
+                                        setDateFilters({
+                                            ...dateFilters,
+                                            start_date: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <div>
+                                <Label>To</Label>
+                                <Input
+                                    type="date"
+                                    value={dateFilters.end_date}
+                                    onChange={(e) =>
+                                        setDateFilters({
+                                            ...dateFilters,
+                                            end_date: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <Button
+                                onClick={() =>
+                                    router.get(
+                                        '/trips',
+                                        {
+                                            start_date: dateFilters.start_date,
+                                            end_date: dateFilters.end_date,
+                                        },
+                                        {
+                                            preserveState: true,
+                                            replace: true,
+                                        },
+                                    )
+                                }
+                            >
+                                Filter
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setDateFilters({
+                                        start_date: '',
+                                        end_date: '',
+                                    });
+
+                                    router.get('/trips');
+                                }}
+                            >
+                                Clear
+                            </Button>
+                        </div>
                     </CardHeader>
 
                     <CardContent>
@@ -113,6 +193,17 @@ export default function Index() {
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
+                                                            onClick={() => {
+                                                                console.log(
+                                                                    trip,
+                                                                );
+                                                                setSelectedTrip(
+                                                                    trip,
+                                                                );
+                                                                setOpenView(
+                                                                    true,
+                                                                );
+                                                            }}
                                                         >
                                                             View
                                                         </Button>
@@ -120,6 +211,14 @@ export default function Index() {
                                                         <Button
                                                             variant="outline"
                                                             size="sm"
+                                                            onClick={() => {
+                                                                setEditingTrip(
+                                                                    trip,
+                                                                );
+                                                                setOpenCreate(
+                                                                    true,
+                                                                );
+                                                            }}
                                                         >
                                                             Edit
                                                         </Button>
@@ -137,9 +236,22 @@ export default function Index() {
 
             <CreateTripModal
                 openCreate={openCreate}
-                setOpenCreate={setOpenCreate}
+                setOpenCreate={(open) => {
+                    setOpenCreate(open);
+
+                    if (!open) {
+                        setEditingTrip(null);
+                    }
+                }}
                 employees={employees}
                 trucks={trucks}
+                trip={editingTrip}
+            />
+
+            <ViewTripModal
+                open={openView}
+                setOpen={setOpenView}
+                selectedTrip={selectedTrip}
             />
         </>
     );

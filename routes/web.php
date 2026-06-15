@@ -5,6 +5,7 @@ use App\Http\Controllers\BillingsController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\CompaniesController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OBController;
@@ -18,7 +19,12 @@ Route::inertia('/', 'welcome')->name('home');
 // Route::middleware(['auth', 'verified'])->group(function () {
 // anyone authenticated
 Route::middleware(['auth'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    // Route::inertia('dashboard', 'dashboard')->name('dashboard');
+    // Employees
+    Route::get(
+        '/dashboard',
+        [DashboardController::class, 'index']
+    )->name('dashboard');
 });
 
 // admin access only

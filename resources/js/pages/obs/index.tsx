@@ -14,7 +14,7 @@ import {
 
 import EmptyState from '@/components/custom/EmptyState';
 import { useState } from 'react';
-import { Input } from '@base-ui/react';
+import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
 
 export default function Index() {
@@ -56,11 +56,6 @@ export default function Index() {
                             Employee balances and deductions.
                         </p>
                     </div>
-
-                    <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Adjust Balance
-                    </Button>
                 </div>
 
                 <Card>
@@ -79,19 +74,21 @@ export default function Index() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead className="border-r">
+                                            <TableHead className="w-45 border-r">
                                                 Employee
                                             </TableHead>
 
-                                            <TableHead className="border-r">
+                                            <TableHead className="w-45 border-r">
                                                 Outstanding Balance
                                             </TableHead>
 
-                                            <TableHead className="border-r">
+                                            <TableHead className="w-45 border-r">
                                                 Last Updated
                                             </TableHead>
 
-                                            <TableHead>Actions</TableHead>
+                                            <TableHead className="w-45">
+                                                Actions
+                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
 
@@ -118,13 +115,13 @@ export default function Index() {
                                                             }
                                                         />
                                                     ) : (
-                                                        <>
-                                                            ₱
+                                                        <div className="align-center flex gap-2">
+                                                            <span>₱</span>
                                                             {Number(
                                                                 employee.balance ??
                                                                     0,
                                                             ).toLocaleString()}
-                                                        </>
+                                                        </div>
                                                     )}
                                                 </TableCell>
 
