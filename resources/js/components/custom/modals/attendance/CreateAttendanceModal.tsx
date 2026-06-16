@@ -14,6 +14,8 @@ import { Label } from '@/components/ui/label';
 interface Employee {
     id: number;
     name: string;
+    image: string;
+    designation: string;
 }
 
 interface CreateAttendanceModalProps {
@@ -131,8 +133,19 @@ export default function CreateAttendanceModal({
                                             toggleEmployee(employee.id)
                                         }
                                     />
+                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                        <img
+                                            src={employee.image}
+                                            alt={employee.name}
+                                            className="h-8 w-8 rounded-full"
+                                        />
+                                    <span>
+                                        {employee.name} -{' '}
+                                        {employee.designation.charAt(0).toUpperCase() +
+                                            employee.designation.slice(1)}
+                                    </span>
+                                    </div>
 
-                                    <span>{employee.name}</span>
                                 </div>
                             ))}
                         </div>
