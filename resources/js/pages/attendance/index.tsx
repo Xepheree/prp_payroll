@@ -13,9 +13,15 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-export default function Index() {
-    const { employees, flash } = usePage().props as PageProps;
+interface Attendance {
+    id: number;
+    period_start: string;
+    period_end: string;
+    status: 'draft' | 'published';
+    employees_count: number;
+}
 
+export default function Index() {
     const [selectedAttendance, setSelectedAttendance] = useState(null);
     const [open, setOpen] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
@@ -25,22 +31,10 @@ export default function Index() {
         setOpen(true);
     };
 
-    const attendances = [
-        {
-            id: 1,
-            periodStart: '2026-06-01',
-            periodEnd: '2026-06-15',
-            employees: 12,
-            status: 'draft',
-        },
-        {
-            id: 2,
-            periodStart: '2026-06-16',
-            periodEnd: '2026-06-30',
-            employees: 12,
-            status: 'published',
-        },
-    ];
+    const { employees, attendances } = usePage().props as {
+        employees: Employee[];
+        attendances: Attendance[];
+    };
 
     return (
         <>
@@ -91,12 +85,21 @@ export default function Index() {
                                     {attendances.map((attendance) => (
                                         <TableRow key={attendance.id}>
                                             <TableCell className="border-r">
-                                                {attendance.periodStart} -{' '}
-                                                {attendance.periodEnd}
+                                                <span className="font-bold">
+                                                    {formatDate(
+                                                        attendance.period_start,
+                                                    )}
+                                                </span>{' '}
+                                                →{' '}
+                                                <span className="font-bold">
+                                                    {formatDate(
+                                                        attendance.period_end,
+                                                    )}
+                                                </span>
                                             </TableCell>
 
                                             <TableCell className="border-r">
-                                                {attendance.employees}
+                                                {attendance.employees_count}
                                             </TableCell>
 
                                             <TableCell className="border-r">
@@ -156,6 +159,13 @@ export default function Index() {
         </>
     );
 }
+
+const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: '2-digit',
+    });
+};
 
 Index.layout = {
     breadcrumbs: [

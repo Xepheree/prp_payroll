@@ -19,6 +19,12 @@ class AttendanceController extends Controller
                 'status',
                 'active'
             )->get(),
+
+            'attendances' => Attendance::withCount([
+                'items as employees_count' => function ($query) {
+                    $query->select(DB::raw('count(distinct employee_id)'));
+                }
+            ])->latest()->get(),
         ]);
     }
 
