@@ -153,7 +153,7 @@ export default function Index() {
                                                             src={
                                                                 employee.image
                                                                     ? `/storage/${employee.image}`
-                                                                    : '/storage/employees/employee_placeholder.png'
+                                                                    : '/images/employee_placeholder.png'
                                                             }
                                                             alt={employee.name}
                                                             className="h-10 w-10 rounded-md border object-cover"

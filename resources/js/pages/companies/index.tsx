@@ -100,7 +100,7 @@ export default function Index() {
                                                         src={
                                                             company.image
                                                                 ? `/storage/${company.image}`
-                                                                : '/storage/placeholder.jpg'
+                                                                : '/images/company_placeholder.jpg'
                                                         }
                                                         alt={company.name}
                                                         className="h-10 w-10 rounded-md border object-cover"

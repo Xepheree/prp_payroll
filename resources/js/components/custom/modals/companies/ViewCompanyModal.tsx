@@ -19,7 +19,7 @@ function ViewCompanyModal({ open, onOpenChange, selectedCompany }) {
                             src={
                                 selectedCompany.image
                                     ? `/storage/${selectedCompany.image}`
-                                    : '/storage/placeholder.jpg'
+                                    : '/images/company_placeholder.jpg'
                             }
                             alt={selectedCompany.name}
                             className="h-56 w-full rounded-lg border object-cover"

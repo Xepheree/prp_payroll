@@ -16,7 +16,7 @@ function ViewEmployeeModal({ open, setOpen, selectedEmployee }) {
                                 src={
                                     selectedEmployee.image
                                         ? `/storage/${selectedEmployee.image}`
-                                        : '/storage/employees/employee_placeholder.png'
+                                        : '/images/employee_placeholder.png'
                                 }
                                 alt={selectedEmployee.name}
                                 className="h-40 w-40 rounded-lg border object-cover"

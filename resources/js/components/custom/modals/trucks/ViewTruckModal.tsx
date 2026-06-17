@@ -20,7 +20,7 @@ function ViewTruckModal({ open, setOpen, selectedTruck }) {
                             src={
                                 selectedTruck.image
                                     ? `/storage/${selectedTruck.image}`
-                                    : '/storage/trucks/truck_placeholder.png'
+                                    : '/images/truck_placeholder.png'
                             }
                             alt={selectedTruck.alias}
                             className="h-48 w-full rounded-lg border object-cover"

@@ -110,7 +110,7 @@ export default function Index() {
                                                             src={
                                                                 truck.image
                                                                     ? `/storage/${truck.image}`
-                                                                    : '/storage/trucks/truck_placeholder.png'
+                                                                    : '/images/truck_placeholder.png'
                                                             }
                                                             alt={truck.plate}
                                                             className="h-10 w-10 rounded-md border object-cover"

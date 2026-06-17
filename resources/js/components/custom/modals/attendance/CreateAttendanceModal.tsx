@@ -133,19 +133,24 @@ export default function CreateAttendanceModal({
                                             toggleEmployee(employee.id)
                                         }
                                     />
-                                    <div className="flex items-center gap-2 flex-shrink-0">
+                                    <div className="flex flex-shrink-0 items-center gap-2">
                                         <img
-                                            src={employee.image}
+                                            src={
+                                                employee.image
+                                                    ? `/storage/${employee.image}`
+                                                    : '/images/employee_placeholder.png'
+                                            }
                                             alt={employee.name}
                                             className="h-8 w-8 rounded-full"
                                         />
-                                    <span>
-                                        {employee.name} -{' '}
-                                        {employee.designation.charAt(0).toUpperCase() +
-                                            employee.designation.slice(1)}
-                                    </span>
+                                        <span>
+                                            {employee.name} -{' '}
+                                            {employee.designation
+                                                .charAt(0)
+                                                .toUpperCase() +
+                                                employee.designation.slice(1)}
+                                        </span>
                                     </div>
-
                                 </div>
                             ))}
                         </div>
