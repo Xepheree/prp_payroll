@@ -6,6 +6,7 @@ use App\Models\Employee;
 use Inertia\Inertia;
 use App\Models\Attendance;
 use App\Models\AttendanceItem;
+use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -77,5 +78,49 @@ class AttendanceController extends Controller
                 'success',
                 'Attendance created successfully.'
             );
+    }
+
+    public function show(Attendance $attendance)
+    {
+        $attendance->load([
+            'items.employee',
+        ]);
+
+        $dates = collect(
+            CarbonPeriod::create(
+                $attendance->period_start,
+                $attendance->period_end
+            )
+        )->map(
+            fn(Carbon $date) => $date->format('Y-m-d')
+        )->values();
+
+        $employees = $attendance->items
+            ->groupBy('employee_id')
+            ->map(function ($items) {
+
+                $employee = $items->first()->employee;
+
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'designation' => $employee->designation,
+
+                    'attendance' => $items
+                        ->keyBy('attendance_date')
+                        ->map(fn($item) => [
+                            'id' => $item->id,
+                            'work_hours' => $item->work_hours,
+                            'overtime_hours' => $item->overtime_hours,
+                        ]),
+                ];
+            })
+            ->values();
+
+        return Inertia::render('attendance/show', [
+            'attendance' => $attendance,
+            'dates' => $dates,
+            'employees' => $employees,
+        ]);
     }
 }

@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import CreateAttendanceModal from '@/components/custom/modals/attendance/CreateAttendanceModal';
@@ -120,6 +120,11 @@ export default function Index() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
+                                                        onClick={() =>
+                                                            router.visit(
+                                                                `/attendance/${attendance.id}`,
+                                                            )
+                                                        }
                                                     >
                                                         View
                                                     </Button>
