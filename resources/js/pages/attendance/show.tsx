@@ -1,6 +1,20 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
+import { useState } from 'react';
+import { toast } from 'sonner';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
     Select,
     SelectContent,
@@ -16,9 +30,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Input } from '@/components/ui/input';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 
 interface Attendance {
     id: number;
@@ -49,6 +60,24 @@ export default function Show() {
         employees: Employee[];
     };
 
+    const initialAttendanceData = employees.reduce((data, employee) => {
+        dates.forEach((date) => {
+            const item = employee.attendance[date];
+
+            if (item) {
+                data[item.id] = item.work_hours;
+            }
+        });
+
+        return data;
+    }, {});
+
+    const [attendanceData, setAttendanceData] = useState(initialAttendanceData);
+    const [savedData, setSavedData] = useState(initialAttendanceData);
+
+    const hasChanges =
+        JSON.stringify(attendanceData) !== JSON.stringify(savedData);
+
     const [designationFilter, setDesignationFilter] = useState('all');
 
     const designations = [
@@ -62,6 +91,37 @@ export default function Show() {
             : employees.filter(
                   (employee) => employee.designation === designationFilter,
               );
+
+    const updateAttendance = () => {
+        router.put(
+            `/attendance/${attendance.id}`,
+            {
+                items: attendanceData,
+            },
+            {
+                onSuccess: () => {
+                    setSavedData(attendanceData);
+
+                    toast.success('Attendance updated successfully');
+                },
+            },
+        );
+    };
+
+    const publishAttendance = () => {
+        router.patch(
+            `/attendance/${attendance.id}/publish`,
+            {},
+            {
+                onSuccess: () => {
+                    toast.success('Attendance published successfully');
+                },
+            },
+        );
+    };
+
+    const [publishOpen, setPublishOpen] = useState(false);
+
     return (
         <>
             <Head title="Attendance Details" />
@@ -101,14 +161,33 @@ export default function Show() {
 
                 <Card>
                     <CardHeader>
-                        <div>
+                        <div className="flex items-center justify-between">
                             <div className="flex flex-col space-y-1">
                                 <CardTitle>Work Hours</CardTitle>
                                 <p className="text-sm text-muted-foreground">
                                     Input attendance details for each employee
                                 </p>
                             </div>
-                            <Button>Update Attendance</Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    onClick={updateAttendance}
+                                    disabled={
+                                        !hasChanges ||
+                                        attendance.status === 'published'
+                                    }
+                                >
+                                    Update Attendance
+                                </Button>
+
+                                {attendance.status === 'draft' && (
+                                    <Button
+                                        onClick={() => setPublishOpen(true)}
+                                        disabled={hasChanges}
+                                    >
+                                        Publish
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </CardHeader>
 
@@ -162,16 +241,41 @@ export default function Show() {
                                                     className="border-r text-center"
                                                 >
                                                     <Input
+                                                        disabled={
+                                                            attendance.status ===
+                                                            'published'
+                                                        }
                                                         type="number"
                                                         min="0"
                                                         max="24"
                                                         step="0.5"
                                                         className="w-16 text-center"
-                                                        defaultValue={
-                                                            employee.attendance[
-                                                                date
-                                                            ]?.work_hours ?? 0
+                                                        value={
+                                                            attendanceData[
+                                                                employee
+                                                                    .attendance[
+                                                                    date
+                                                                ]?.id
+                                                            ] ?? 0
                                                         }
+                                                        onChange={(e) => {
+                                                            const itemId =
+                                                                employee
+                                                                    .attendance[
+                                                                    date
+                                                                ]?.id;
+
+                                                            if (!itemId) return;
+
+                                                            setAttendanceData(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    [itemId]:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            );
+                                                        }}
                                                     />
                                                 </TableCell>
                                             ))}
@@ -183,6 +287,28 @@ export default function Show() {
                     </CardContent>
                 </Card>
             </div>
+
+            <AlertDialog open={publishOpen} onOpenChange={setPublishOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Publish Attendance?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            Once published, this attendance will be locked and
+                            used for payroll calculations. Make sure all work
+                            hours are correct before proceeding.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                        <AlertDialogAction onClick={publishAttendance}>
+                            Publish
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }

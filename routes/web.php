@@ -69,6 +69,10 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // Attendance
     Route::resource('attendance', AttendanceController::class);
+    Route::patch(
+        '/attendance/{attendance}/publish',
+        [AttendanceController::class, 'publish']
+    )->name('attendance.publish');
 });
 
 require __DIR__ . '/settings.php';

@@ -123,4 +123,47 @@ class AttendanceController extends Controller
             'employees' => $employees,
         ]);
     }
+
+    public function update(
+        Request $request,
+        Attendance $attendance
+    ) {
+        $validated = $request->validate([
+            'items' => ['required', 'array'],
+        ]);
+
+        foreach ($validated['items'] as $itemId => $hours) {
+
+            AttendanceItem::where(
+                'id',
+                $itemId
+            )->update([
+                'work_hours' => $hours,
+            ]);
+        }
+
+        return back()->with(
+            'success',
+            'Attendance updated successfully.'
+        );
+    }
+
+    public function publish(
+        Attendance $attendance
+    ) {
+        if ($attendance->status === 'published') {
+            return back()->withErrors([
+                'attendance' => 'Attendance already published.',
+            ]);
+        }
+
+        $attendance->update([
+            'status' => 'published',
+        ]);
+
+        return back()->with(
+            'success',
+            'Attendance published successfully.'
+        );
+    }
 }
