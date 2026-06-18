@@ -1,7 +1,13 @@
 import { Head, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import {
     Table,
     TableBody,
@@ -12,14 +18,7 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 
 interface Attendance {
     id: number;
@@ -102,7 +101,15 @@ export default function Show() {
 
                 <Card>
                     <CardHeader>
-                        {/* <CardTitle>Attendance Sheet</CardTitle> */}
+                        <div>
+                            <div className="flex flex-col space-y-1">
+                                <CardTitle>Work Hours</CardTitle>
+                                <p className="text-sm text-muted-foreground">
+                                    Input attendance details for each employee
+                                </p>
+                            </div>
+                            <Button>Update Attendance</Button>
+                        </div>
                     </CardHeader>
 
                     <CardContent>

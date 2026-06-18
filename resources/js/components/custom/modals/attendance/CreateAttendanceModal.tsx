@@ -133,7 +133,7 @@ export default function CreateAttendanceModal({
                                             toggleEmployee(employee.id)
                                         }
                                     />
-                                    <div className="flex flex-shrink-0 items-center gap-2">
+                                    <div className="flex shrink-0 items-center gap-2">
                                         <img
                                             src={
                                                 employee.image
