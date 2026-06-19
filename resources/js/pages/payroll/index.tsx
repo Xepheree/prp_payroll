@@ -1,6 +1,8 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
-
+import { useState } from 'react';
+import CreatePayrollModal from '@/components/custom/modals/payroll/CreatePayrollModa';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -11,35 +13,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 
 export default function Index() {
-    const payrolls = [
-        {
-            id: 1,
-            startDate: '2026-06-01',
-            endDate: '2026-06-07',
-            employees: 12,
-            totalPay: 58400,
-            status: 'Paid',
-        },
-        {
-            id: 2,
-            startDate: '2026-06-08',
-            endDate: '2026-06-14',
-            employees: 12,
-            totalPay: 61200,
-            status: 'Finalized',
-        },
-        {
-            id: 3,
-            startDate: '2026-06-15',
-            endDate: '2026-06-21',
-            employees: 12,
-            totalPay: 0,
-            status: 'Draft',
-        },
-    ];
+    const [openCreate, setOpenCreate] = useState(false);
+    const { payrolls, availableAttendances } = usePage().props;
 
     return (
         <>
@@ -55,7 +32,7 @@ export default function Index() {
                         </p>
                     </div>
 
-                    <Button>
+                    <Button onClick={() => setOpenCreate(true)}>
                         <Plus className="mr-2 h-4 w-4" />
                         New Payroll
                     </Button>
@@ -142,6 +119,12 @@ export default function Index() {
                     </CardContent>
                 </Card>
             </div>
+
+            <CreatePayrollModal
+                open={openCreate}
+                setOpen={setOpenCreate}
+                attendances={availableAttendances}
+            />
         </>
     );
 }

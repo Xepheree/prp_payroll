@@ -17,6 +17,13 @@ class Payroll extends Model
         'end_date' => 'date',
     ];
 
+    public function attendance()
+    {
+        return $this->belongsTo(
+            Attendance::class
+        );
+    }
+
     public function items()
     {
         return $this->hasMany(PayrollItem::class);

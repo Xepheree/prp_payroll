@@ -13,6 +13,13 @@ class Attendance extends Model
         'status',
     ];
 
+    public function payroll()
+    {
+        return $this->hasOne(
+            Payroll::class
+        );
+    }
+
     public function items()
     {
         return $this->hasMany(AttendanceItem::class);
