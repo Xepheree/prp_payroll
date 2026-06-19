@@ -30,6 +30,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
 interface Attendance {
     id: number;
@@ -235,50 +236,63 @@ export default function Show() {
                                                 </div>
                                             </TableCell>
 
-                                            {dates.map((date) => (
-                                                <TableCell
-                                                    key={date}
-                                                    className="border-r text-center"
-                                                >
-                                                    <Input
-                                                        disabled={
-                                                            attendance.status ===
-                                                            'published'
-                                                        }
-                                                        type="number"
-                                                        min="0"
-                                                        max="24"
-                                                        step="0.5"
-                                                        className="w-16 text-center"
-                                                        value={
-                                                            attendanceData[
-                                                                employee
-                                                                    .attendance[
-                                                                    date
-                                                                ]?.id
-                                                            ] ?? 0
-                                                        }
-                                                        onChange={(e) => {
-                                                            const itemId =
-                                                                employee
-                                                                    .attendance[
-                                                                    date
-                                                                ]?.id;
+                                            {dates.map((date) => {
+                                                const itemId =
+                                                    employee.attendance[date]
+                                                        ?.id;
+                                                const currentValue = Number(
+                                                    attendanceData[itemId] ?? 0,
+                                                );
 
-                                                            if (!itemId) return;
+                                                return (
+                                                    <TableCell
+                                                        key={date}
+                                                        className="border-r text-center"
+                                                    >
+                                                        <Input
+                                                            onFocus={(e) => {
+                                                                requestAnimationFrame(
+                                                                    () => {
+                                                                        e.target.select();
+                                                                    },
+                                                                );
+                                                            }}
+                                                            disabled={
+                                                                attendance.status ===
+                                                                'published'
+                                                            }
+                                                            type="number"
+                                                            min="0"
+                                                            max="24"
+                                                            step="0.5"
+                                                            style={getAttendanceStyle(
+                                                                currentValue,
+                                                            )}
+                                                            className={
+                                                                'w-16 border text-center'
+                                                            }
+                                                            value={currentValue}
+                                                            onFocus={(e) =>
+                                                                e.target.select()
+                                                            }
+                                                            onChange={(e) => {
+                                                                if (!itemId)
+                                                                    return;
 
-                                                            setAttendanceData(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    [itemId]:
-                                                                        e.target
-                                                                            .value,
-                                                                }),
-                                                            );
-                                                        }}
-                                                    />
-                                                </TableCell>
-                                            ))}
+                                                                setAttendanceData(
+                                                                    (prev) => ({
+                                                                        ...prev,
+                                                                        [itemId]:
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                    }),
+                                                                );
+                                                            }}
+                                                        />
+                                                    </TableCell>
+                                                );
+                                            })}
                                         </TableRow>
                                     ))}
                                 </TableBody>
@@ -323,4 +337,39 @@ Show.layout = {
             title: 'View',
         },
     ],
+};
+
+// This function takes 3 colors and use the hours to calculate the ratio and return a blended color between red, yellow, and green. 0 hours is red, 8 hours is green, and anything above 8 hours is blue.
+const getAttendanceStyle = (hours: number) => {
+    if (hours <= 4) {
+        const ratio = hours / 4;
+
+        return {
+            borderColor: `rgb(
+                255,
+                ${Math.round(255 * ratio)},
+                0
+            )`,
+            backgroundColor: `rgba(
+                255,
+                ${Math.round(255 * ratio)},
+                0, 0.2
+            )`,
+        };
+    }
+
+    const ratio = (hours - 4) / 4;
+
+    return {
+        borderColor: `rgb(
+            ${Math.round(255 * (1 - ratio))},
+            255,
+            0
+        )`,
+        backgroundColor: `rgba(
+            ${Math.round(255 * (1 - ratio))},
+            255,
+            0, 0.2
+        )`,
+    };
 };

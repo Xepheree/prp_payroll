@@ -138,7 +138,7 @@ class AttendanceController extends Controller
                 'id',
                 $itemId
             )->update([
-                'work_hours' => $hours,
+                'work_hours' => (float) ($hours ?: 0),
             ]);
         }
 
