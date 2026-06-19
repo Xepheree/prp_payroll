@@ -12,6 +12,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
 
 interface Attendance {
     id: number;
@@ -19,6 +20,8 @@ interface Attendance {
     period_end: string;
     status: 'draft' | 'published';
     employees_count: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export default function Index() {
@@ -45,7 +48,8 @@ export default function Index() {
                     <div>
                         <h1 className="text-3xl font-bold">Attendance</h1>
                         <p className="text-muted-foreground">
-                            Record attendance of each employee
+                            Click on an attendance record to view details and
+                            manage entries.
                         </p>
                     </div>
 
@@ -76,14 +80,22 @@ export default function Index() {
                                         <TableHead className="border-r">
                                             Status
                                         </TableHead>
-
-                                        <TableHead>Actions</TableHead>
+                                        <TableHead>Last Updated</TableHead>
+                                        <TableHead>Created</TableHead>
                                     </TableRow>
                                 </TableHeader>
 
                                 <TableBody>
                                     {attendances.map((attendance) => (
-                                        <TableRow key={attendance.id}>
+                                        <TableRow
+                                            key={attendance.id}
+                                            onClick={() =>
+                                                router.visit(
+                                                    `/attendance/${attendance.id}`,
+                                                )
+                                            }
+                                            className="cursor-pointer"
+                                        >
                                             <TableCell className="border-r">
                                                 <span className="font-bold">
                                                     {formatDate(
@@ -103,49 +115,21 @@ export default function Index() {
                                             </TableCell>
 
                                             <TableCell className="border-r">
-                                                <span
-                                                    className={
-                                                        attendance.status ===
-                                                        'published'
-                                                            ? 'font-medium text-green-600'
-                                                            : 'font-medium text-yellow-600'
-                                                    }
-                                                >
-                                                    {attendance.status}
-                                                </span>
+                                                {getAttendanceStatusBadge(
+                                                    attendance.status,
+                                                )}
                                             </TableCell>
 
                                             <TableCell>
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                        onClick={() =>
-                                                            router.visit(
-                                                                `/attendance/${attendance.id}`,
-                                                            )
-                                                        }
-                                                    >
-                                                        View
-                                                    </Button>
+                                                {formatDateTime(
+                                                    attendance.updated_at,
+                                                )}
+                                            </TableCell>
 
-                                                    {attendance.status ===
-                                                        'draft' && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                    )}
-
-                                                    {attendance.status ===
-                                                        'draft' && (
-                                                        <Button size="sm">
-                                                            Publish
-                                                        </Button>
-                                                    )}
-                                                </div>
+                                            <TableCell>
+                                                {formatDateTime(
+                                                    attendance.created_at,
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -164,6 +148,37 @@ export default function Index() {
         </>
     );
 }
+
+const formatDateTime = (date: string) => {
+    return new Date(date).toLocaleString('en-US', {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+    });
+};
+
+export const getAttendanceStatusBadge = (status) => {
+    switch (status) {
+        case 'published':
+            return (
+                <Badge className="bg-green-500 hover:bg-green-600">
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                </Badge>
+            );
+
+        case 'draft':
+            return (
+                <Badge className="bg-yellow-500 hover:bg-yellow-600">
+                    Draft
+                </Badge>
+            );
+
+        default:
+            return <Badge variant="secondary">{status}</Badge>;
+    }
+};
 
 const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
