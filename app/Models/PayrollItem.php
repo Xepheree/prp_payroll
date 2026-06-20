@@ -39,6 +39,7 @@ class PayrollItem extends Model
         'basic_pay' => 'decimal:2',
         'trip_pay' => 'decimal:2',
         'overtime_pay' => 'decimal:2',
+        'days_worked' => 'decimal:2',
 
         'deductions' => 'decimal:2',
 

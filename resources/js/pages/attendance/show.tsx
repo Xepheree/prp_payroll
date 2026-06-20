@@ -179,15 +179,6 @@ export default function Show() {
                                 >
                                     Update Attendance
                                 </Button>
-
-                                {attendance.status === 'draft' && (
-                                    <Button
-                                        onClick={() => setPublishOpen(true)}
-                                        disabled={hasChanges}
-                                    >
-                                        Publish
-                                    </Button>
-                                )}
                             </div>
                         </div>
                     </CardHeader>
@@ -297,6 +288,16 @@ export default function Show() {
                                     ))}
                                 </TableBody>
                             </Table>
+                        </div>
+                        <div className="mt-5 flex justify-end">
+                            {attendance.status === 'draft' && (
+                                <Button
+                                    onClick={() => setPublishOpen(true)}
+                                    disabled={hasChanges}
+                                >
+                                    Publish
+                                </Button>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

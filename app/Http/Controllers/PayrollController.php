@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Payroll;
+use App\Models\PayrollItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class PayrollController extends Controller
@@ -63,6 +65,74 @@ class PayrollController extends Controller
                     ->first()
                     ->employee;
 
+                /*
+            |--------------------------------------------------------------------------
+            | Attendance Computation
+            |--------------------------------------------------------------------------
+            */
+
+                $daysWorked = 0;
+                $workHours = 0;
+                $overtimeHours = 0;
+
+                foreach ($employeeItems as $item) {
+
+                    $hours = $item->work_hours;
+
+                    // Days Worked
+                    if ($hours >= 8) {
+                        $daysWorked += 1;
+                    } elseif ($hours > 0) {
+                        $daysWorked += $hours / 8;
+                    }
+
+                    // Regular Hours (max 8/day)
+                    $workHours += min(8, $hours);
+
+                    // Overtime Hours
+                    $overtimeHours += max(
+                        0,
+                        $hours - 8
+                    );
+                }
+
+                /*
+            |--------------------------------------------------------------------------
+            | Payroll Computation
+            |--------------------------------------------------------------------------
+            */
+
+                $deliveryCount = 0;
+
+                $basicPay =
+                    $daysWorked *
+                    $employee->rate;
+
+                $tripPay =
+                    $deliveryCount *
+                    ($employee->trip_rate ?? 0);
+
+                $overtimePay =
+                    $overtimeHours *
+                    $employee->ot_rate;
+
+                $deductions = 0;
+
+                $grossPay =
+                    $basicPay +
+                    $tripPay +
+                    $overtimePay;
+
+                $netPay =
+                    $grossPay -
+                    $deductions;
+
+                /*
+            |--------------------------------------------------------------------------
+            | Payroll Item Snapshot
+            |--------------------------------------------------------------------------
+            */
+
                 PayrollItem::create([
                     'payroll_id' => $payroll->id,
                     'employee_id' => $employee->id,
@@ -70,20 +140,20 @@ class PayrollController extends Controller
                     'daily_rate' => $employee->rate,
                     'trip_rate' => $employee->trip_rate,
 
-                    'days_worked' => 0,
-                    'work_hours' => 0,
-                    'overtime_hours' => 0,
+                    'days_worked' => round($daysWorked, 2),
+                    'work_hours' => $workHours,
+                    'overtime_hours' => $overtimeHours,
 
-                    'delivery_count' => 0,
+                    'delivery_count' => $deliveryCount,
 
-                    'basic_pay' => 0,
-                    'trip_pay' => 0,
-                    'overtime_pay' => 0,
+                    'basic_pay' => $basicPay,
+                    'trip_pay' => $tripPay,
+                    'overtime_pay' => $overtimePay,
 
-                    'deductions' => 0,
+                    'deductions' => $deductions,
 
-                    'gross_pay' => 0,
-                    'net_pay' => 0,
+                    'gross_pay' => $grossPay,
+                    'net_pay' => $netPay,
                 ]);
             }
         });
@@ -94,5 +164,20 @@ class PayrollController extends Controller
                 'success',
                 'Payroll created successfully.'
             );
+    }
+
+    public function show(Payroll $payroll)
+    {
+        $payroll->load([
+            'items.employee',
+            'attendance',
+        ]);
+
+        return Inertia::render(
+            'payroll/show',
+            [
+                'payroll' => $payroll,
+            ]
+        );
     }
 }

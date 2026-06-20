@@ -1,7 +1,7 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import CreatePayrollModal from '@/components/custom/modals/payroll/CreatePayrollModa';
+import CreatePayrollModal from '@/components/custom/modals/payroll/CreatePayrollModal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { formatDate } from '@/lib/utils';
 
 export default function Index() {
     const [openCreate, setOpenCreate] = useState(false);
@@ -45,76 +46,46 @@ export default function Index() {
 
                     <CardContent>
                         <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="border-r">
-                                            Payroll Period
-                                        </TableHead>
+                            <TableBody>
+                                {payrolls.map((payroll) => (
+                                    <TableRow key={payroll.id}>
+                                        <TableCell className="border-r font-medium">
+                                            {formatDate(payroll.start_date)} -{' '}
+                                            {formatDate(payroll.end_date)}
+                                        </TableCell>
 
-                                        <TableHead className="border-r">
-                                            Employees
-                                        </TableHead>
+                                        <TableCell className="border-r">
+                                            -
+                                        </TableCell>
 
-                                        <TableHead className="border-r">
-                                            Total Payroll
-                                        </TableHead>
+                                        <TableCell className="border-r">
+                                            ₱0.00
+                                        </TableCell>
 
-                                        <TableHead className="border-r">
-                                            Status
-                                        </TableHead>
+                                        <TableCell className="border-r">
+                                            {getPayrollStatusBadge(
+                                                payroll.status,
+                                            )}
+                                        </TableCell>
 
-                                        <TableHead>Actions</TableHead>
+                                        <TableCell>
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    onClick={() =>
+                                                        router.visit(
+                                                            `/payroll/${payroll.id}`,
+                                                        )
+                                                    }
+                                                >
+                                                    View
+                                                </Button>
+                                            </div>
+                                        </TableCell>
                                     </TableRow>
-                                </TableHeader>
-
-                                <TableBody>
-                                    {payrolls.map((payroll) => (
-                                        <TableRow key={payroll.id}>
-                                            <TableCell className="border-r font-medium">
-                                                {payroll.startDate} -{' '}
-                                                {payroll.endDate}
-                                            </TableCell>
-
-                                            <TableCell className="border-r">
-                                                {payroll.employees}
-                                            </TableCell>
-
-                                            <TableCell className="border-r">
-                                                ₱
-                                                {payroll.totalPay.toLocaleString()}
-                                            </TableCell>
-
-                                            <TableCell className="border-r">
-                                                {getPayrollStatusBadge(
-                                                    payroll.status,
-                                                )}
-                                            </TableCell>
-
-                                            <TableCell>
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="sm"
-                                                    >
-                                                        View
-                                                    </Button>
-
-                                                    {payroll.status ===
-                                                        'Draft' && (
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                        >
-                                                            Edit
-                                                        </Button>
-                                                    )}
-                                                </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                                ))}
+                            </TableBody>
                         </div>
                     </CardContent>
                 </Card>
@@ -140,26 +111,14 @@ Index.layout = {
 
 export const getPayrollStatusBadge = (status: string) => {
     switch (status) {
-        case 'Paid':
-            return (
-                <Badge className="bg-green-500 hover:bg-green-600">
-                    {status}
-                </Badge>
-            );
+        case 'paid':
+            return <Badge className="bg-green-500">Paid</Badge>;
 
-        case 'Finalized':
-            return (
-                <Badge className="bg-blue-500 hover:bg-blue-600">
-                    {status}
-                </Badge>
-            );
+        case 'finalized':
+            return <Badge className="bg-blue-500">Finalized</Badge>;
 
-        case 'Draft':
-            return (
-                <Badge className="bg-yellow-500 hover:bg-yellow-600">
-                    {status}
-                </Badge>
-            );
+        case 'draft':
+            return <Badge className="bg-yellow-500">Draft</Badge>;
 
         default:
             return <Badge variant="secondary">{status}</Badge>;

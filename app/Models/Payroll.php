@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Payroll extends Model
 {
     protected $fillable = [
+        'attendance_id',
         'start_date',
         'end_date',
         'status',

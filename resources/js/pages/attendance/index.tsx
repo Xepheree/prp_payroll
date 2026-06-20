@@ -13,6 +13,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { formatDate } from '@/lib/utils';
 
 interface Attendance {
     id: number;
@@ -178,13 +179,6 @@ export const getAttendanceStatusBadge = (status) => {
         default:
             return <Badge variant="secondary">{status}</Badge>;
     }
-};
-
-const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString('en-US', {
-        month: 'short',
-        day: '2-digit',
-    });
 };
 
 Index.layout = {
