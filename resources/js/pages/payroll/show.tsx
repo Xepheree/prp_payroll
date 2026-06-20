@@ -27,6 +27,7 @@ interface PayrollItem {
 
     work_hours: number;
     overtime_hours: number;
+    delivery_count: number;
 
     basic_pay: number;
     trip_pay: number;
@@ -125,7 +126,10 @@ export default function Show() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Employee Payroll</CardTitle>
+                        <CardTitle>
+                            Employee Payroll : Next todo: fix the incentives:
+                            OT, Trips then the Cash Advances.
+                        </CardTitle>
                     </CardHeader>
 
                     <CardContent>
@@ -139,6 +143,10 @@ export default function Show() {
                                     <TableHead>Hours</TableHead>
 
                                     <TableHead>OT</TableHead>
+
+                                    <TableHead>Trips</TableHead>
+
+                                    <TableHead>Trip Incentive</TableHead>
 
                                     <TableHead>Gross</TableHead>
 
@@ -164,6 +172,12 @@ export default function Show() {
                                         <TableCell>
                                             {item.overtime_hours}
                                         </TableCell>
+
+                                        <TableCell>
+                                            {item.delivery_count}
+                                        </TableCell>
+
+                                        <TableCell>{item.trip_pay}</TableCell>
 
                                         <TableCell>
                                             ₱

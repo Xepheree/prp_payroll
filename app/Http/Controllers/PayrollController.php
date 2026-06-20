@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
+use App\Models\Trip;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -65,6 +66,26 @@ class PayrollController extends Controller
                     ->first()
                     ->employee;
 
+                $deliveryCount = Trip::whereBetween(
+                    'trip_date',
+                    [
+                        $attendance->period_start,
+                        $attendance->period_end,
+                    ]
+                )
+                    ->where('trip_type', 'deliver')
+                    ->where(function ($query) use ($employee) {
+
+                        $query->where(
+                            'driver_id',
+                            $employee->id
+                        )
+                            ->orWhere(
+                                'helper_id',
+                                $employee->id
+                            );
+                    })
+                    ->count();
                 /*
             |--------------------------------------------------------------------------
             | Attendance Computation
@@ -102,7 +123,6 @@ class PayrollController extends Controller
             |--------------------------------------------------------------------------
             */
 
-                $deliveryCount = 0;
 
                 $basicPay =
                     $daysWorked *
@@ -124,7 +144,7 @@ class PayrollController extends Controller
                     $overtimePay;
 
                 $netPay =
-                    $grossPay -
+                    ($grossPay + $tripPay) -
                     $deductions;
 
                 /*
