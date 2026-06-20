@@ -87,7 +87,7 @@ export default function Index() {
                                 </TableHeader>
 
                                 <TableBody>
-                                    {attendances.map((attendance) => (
+                                    {attendances.map((attendance, index) => (
                                         <TableRow
                                             key={attendance.id}
                                             onClick={() =>
@@ -95,7 +95,11 @@ export default function Index() {
                                                     `/attendance/${attendance.id}`,
                                                 )
                                             }
-                                            className="cursor-pointer"
+                                            className={`cursor-pointer ${
+                                                index === 0
+                                                    ? 'border-l-4 border-l-green-500 bg-green-500/10 hover:bg-green-500/20'
+                                                    : ''
+                                            }`}
                                         >
                                             <TableCell className="border-r">
                                                 <span className="font-bold">

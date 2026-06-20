@@ -43,49 +43,55 @@ export default function Index() {
                     <CardHeader>
                         <CardTitle>Payroll Records</CardTitle>
                     </CardHeader>
-
                     <CardContent>
                         <div className="rounded-md border">
-                            <TableBody>
-                                {payrolls.map((payroll) => (
-                                    <TableRow key={payroll.id}>
-                                        <TableCell className="border-r font-medium">
-                                            {formatDate(payroll.start_date)} -{' '}
-                                            {formatDate(payroll.end_date)}
-                                        </TableCell>
-
-                                        <TableCell className="border-r">
-                                            -
-                                        </TableCell>
-
-                                        <TableCell className="border-r">
-                                            ₱0.00
-                                        </TableCell>
-
-                                        <TableCell className="border-r">
-                                            {getPayrollStatusBadge(
-                                                payroll.status,
-                                            )}
-                                        </TableCell>
-
-                                        <TableCell>
-                                            <div className="flex gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        router.visit(
-                                                            `/payroll/${payroll.id}`,
-                                                        )
-                                                    }
-                                                >
-                                                    View
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Payroll Period</TableHead>
+                                        <TableHead>Employees</TableHead>
+                                        <TableHead>Total Payroll</TableHead>
+                                        <TableHead>Status</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
+                                </TableHeader>
+
+                                <TableBody>
+                                    {payrolls.map((payroll, index) => (
+                                        <TableRow
+                                            key={payroll.id}
+                                            onClick={() =>
+                                                router.visit(
+                                                    `/payroll/${payroll.id}`,
+                                                )
+                                            }
+                                            className={`cursor-pointer border-r font-medium ${
+                                                index === 0
+                                                    ? 'border-l-4 border-l-green-500 bg-green-500/10 hover:bg-green-500/20'
+                                                    : ''
+                                            }`}
+                                        >
+                                            <TableCell>
+                                                {formatDate(payroll.start_date)}{' '}
+                                                - {formatDate(payroll.end_date)}
+                                            </TableCell>
+
+                                            <TableCell className="border-r">
+                                                -
+                                            </TableCell>
+
+                                            <TableCell className="border-r">
+                                                ₱0.00
+                                            </TableCell>
+
+                                            <TableCell className="border-r">
+                                                {getPayrollStatusBadge(
+                                                    payroll.status,
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
                         </div>
                     </CardContent>
                 </Card>

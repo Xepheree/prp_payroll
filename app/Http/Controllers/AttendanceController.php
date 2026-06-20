@@ -38,6 +38,24 @@ class AttendanceController extends Controller
             'employee_ids.*' => ['exists:employees,id'],
         ]);
 
+        $overlappingAttendance = Attendance::where(
+            'period_start',
+            '<=',
+            $validated['period_end']
+        )
+            ->where(
+                'period_end',
+                '>=',
+                $validated['period_start']
+            )
+            ->exists();
+
+        if ($overlappingAttendance) {
+            return back()->withErrors([
+                'period_start' => 'Attendance period overlaps an existing attendance.',
+            ]);
+        }
+
         DB::transaction(function () use ($validated) {
 
             $attendance = Attendance::create([

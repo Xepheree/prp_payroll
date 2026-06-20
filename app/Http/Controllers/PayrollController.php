@@ -14,7 +14,7 @@ class PayrollController extends Controller
     public function index()
     {
         return Inertia::render('payroll/index', [
-            'payrolls' => Payroll::all(),
+            'payrolls' => Payroll::latest()->get(),
             'availableAttendances' => Attendance::where(
                 'status',
                 'published'

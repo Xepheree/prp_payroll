@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 interface Employee {
     id: number;
@@ -45,12 +46,38 @@ export default function CreateAttendanceModal({
     };
 
     const handleSubmit = () => {
-        router.post('/attendance', {
-            period_start: form.period_start,
-            period_end: form.period_end,
-            employee_ids: selectedEmployees,
-        });
-        setOpen(false);
+        router.post(
+            '/attendance',
+            {
+                period_start: form.period_start,
+                period_end: form.period_end,
+                employee_ids: selectedEmployees,
+            },
+            {
+                onSuccess: () => {
+                    toast.success('Attendance created successfully');
+
+                    setOpen(false);
+
+                    setForm({
+                        period_start: '',
+                        period_end: '',
+                    });
+
+                    setSelectedEmployees([]);
+                },
+
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+
+                    if (firstError) {
+                        toast.error(firstError as string);
+                    } else {
+                        toast.error('Failed to create attendance');
+                    }
+                },
+            },
+        );
     };
 
     return (
