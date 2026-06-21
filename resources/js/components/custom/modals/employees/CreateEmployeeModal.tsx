@@ -36,6 +36,7 @@ function CreateEmployeeModal({
         designation: string;
         rate: string;
         ot_rate: string;
+        trip_rate: string;
         status: string;
     }>({
         image: null,
@@ -43,6 +44,7 @@ function CreateEmployeeModal({
         designation: '',
         rate: '',
         ot_rate: '',
+        trip_rate: '',
         status: 'active',
     });
 
@@ -53,6 +55,7 @@ function CreateEmployeeModal({
             designation: '',
             rate: '',
             ot_rate: '',
+            trip_rate: '',
             status: 'active',
         });
 
@@ -71,6 +74,7 @@ function CreateEmployeeModal({
         data.append('designation', form.designation);
         data.append('rate', form.rate);
         data.append('ot_rate', form.ot_rate);
+        data.append('trip_rate', form.trip_rate);
         data.append('status', form.status);
 
         if (form.image) {
@@ -122,6 +126,7 @@ function CreateEmployeeModal({
                 designation: employee.designation || '',
                 rate: employee.rate || '',
                 ot_rate: employee.ot_rate || '',
+                trip_rate: employee.trip_rate || '',
                 status: employee.status || 'active',
             });
 
@@ -254,6 +259,21 @@ function CreateEmployeeModal({
                                 setForm({
                                     ...form,
                                     ot_rate: e.target.value,
+                                })
+                            }
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Trip Rate</Label>
+
+                        <Input
+                            type="number"
+                            value={form.trip_rate}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    trip_rate: e.target.value,
                                 })
                             }
                         />

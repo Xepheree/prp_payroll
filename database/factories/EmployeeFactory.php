@@ -26,7 +26,11 @@ class EmployeeFactory extends Factory
                 1000,
             ]),
             'ot_rate' => fake()->randomElement([
+                70,
                 80,
+                100,
+            ]),
+            'trip_rate' => fake()->randomElement([
                 100,
                 120,
                 150,

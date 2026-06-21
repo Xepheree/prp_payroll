@@ -29,6 +29,7 @@ class EmployeeController extends Controller
             'designation' => 'required|string|max:255',
             'rate' => 'required|numeric',
             'ot_rate' => 'required|numeric',
+            'trip_rate' => 'required|numeric',
             'status' => 'required|string',
             'description' => 'nullable|string',
         ]);
@@ -47,6 +48,7 @@ class EmployeeController extends Controller
             'designation' => $request->designation,
             'rate' => $request->rate,
             'ot_rate' => $request->ot_rate,
+            'trip_rate' => $request->trip_rate,
             'status' => $request->status,
             'description' => $request->description,
         ]);
@@ -77,6 +79,7 @@ class EmployeeController extends Controller
             'designation' => 'required',
             'rate' => 'required',
             'ot_rate' => 'required',
+            'trip_rate' => 'required',
             'status' => 'required',
         ]);
 
@@ -98,6 +101,7 @@ class EmployeeController extends Controller
             'designation' => $request->designation,
             'rate' => $request->rate,
             'ot_rate' => $request->ot_rate,
+            'trip_rate' => $request->trip_rate,
             'status' => $request->status,
         ]);
 

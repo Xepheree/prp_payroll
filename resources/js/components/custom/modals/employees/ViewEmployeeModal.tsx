@@ -52,6 +52,15 @@ function ViewEmployeeModal({ open, setOpen, selectedEmployee }) {
                                             {selectedEmployee.ot_rate.toLocaleString()}
                                         </span>
                                     </div>
+                                    <div className="flex w-full justify-between gap-2">
+                                        <span className="font-semibold">
+                                            Trip Rate:
+                                        </span>
+                                        <span>
+                                            ₱
+                                            {selectedEmployee.trip_rate.toLocaleString()}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

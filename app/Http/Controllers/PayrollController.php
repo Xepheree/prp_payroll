@@ -124,6 +124,7 @@ class PayrollController extends Controller
             */
 
 
+            
                 $basicPay =
                     $daysWorked *
                     $employee->rate;

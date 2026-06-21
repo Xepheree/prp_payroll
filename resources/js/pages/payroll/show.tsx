@@ -144,9 +144,11 @@ export default function Show() {
 
                                     <TableHead>OT</TableHead>
 
+                                    <TableHead>OT Pay</TableHead>
+
                                     <TableHead>Trips</TableHead>
 
-                                    <TableHead>Trip Incentive</TableHead>
+                                    <TableHead>Trip Pay</TableHead>
 
                                     <TableHead>Gross</TableHead>
 
@@ -171,6 +173,10 @@ export default function Show() {
 
                                         <TableCell>
                                             {item.overtime_hours}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {item.overtime_pay}
                                         </TableCell>
 
                                         <TableCell>
