@@ -1,8 +1,10 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
-
+import { useState } from 'react';
+import { toast } from 'sonner';
+import EmptyState from '@/components/custom/EmptyState';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
     Table,
     TableBody,
@@ -12,10 +14,16 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import EmptyState from '@/components/custom/EmptyState';
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
+interface Employee {
+    id: number;
+    name: string;
+    balance: number | null;
+    updated_at: string;
+}
+
+interface PageProps {
+    employees: Employee[];
+}
 
 export default function Index() {
     const { employees } = usePage().props as PageProps;
@@ -93,7 +101,7 @@ export default function Index() {
                                     </TableHeader>
 
                                     <TableBody>
-                                        {employees.map((employee) => (
+                                        {employees.map((employee: Employee) => (
                                             <TableRow key={employee.id}>
                                                 <TableCell className="border-r font-medium">
                                                     {employee.name}
