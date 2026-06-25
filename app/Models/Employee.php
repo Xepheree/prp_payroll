@@ -34,4 +34,9 @@ class Employee extends Model
     {
         return $this->hasMany(PayrollItem::class);
     }
+
+    public function deductions()
+    {
+        return $this->hasMany(Deduction::class);
+    }
 }

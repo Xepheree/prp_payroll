@@ -58,7 +58,7 @@ export function AppSidebar() {
                       icon: Truck,
                   },
                   {
-                      title: 'OB & CA',
+                      title: 'Outstanding Balances',
                       href: '/obs',
                       icon: HandCoins,
                   },

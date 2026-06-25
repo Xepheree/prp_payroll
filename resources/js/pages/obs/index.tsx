@@ -13,6 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { Plus } from 'lucide-react';
 
 interface Employee {
     id: number;

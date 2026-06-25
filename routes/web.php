@@ -6,6 +6,7 @@ use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DeductionController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OBController;
@@ -40,14 +41,22 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     // Route::resource('obs', OBController::class);
     Route::get('/obs', [OBController::class, 'index'])
         ->name('obs.index');
-
     Route::patch(
         '/obs/{employee}',
         [OBController::class, 'update']
     )->name('obs.update');
 
+    // Deductions
+    Route::get('/deductions', [DeductionController::class, 'index'])
+        ->name('deductions.index');
+
+
     // Payroll
     Route::resource('payroll', PayrollController::class);
+    Route::get(
+        '/payroll/deductions',
+        [AttendanceController::class, 'publish']
+    )->name('attendance.publish');
 
     // Billings
     Route::resource('billings', BillingsController::class);

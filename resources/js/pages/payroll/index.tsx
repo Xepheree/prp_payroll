@@ -1,5 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { HandCoins, Plus } from 'lucide-react';
 import { useState } from 'react';
 import CreatePayrollModal from '@/components/custom/modals/payroll/CreatePayrollModal';
 import { Badge } from '@/components/ui/badge';
@@ -33,10 +33,16 @@ export default function Index() {
                         </p>
                     </div>
 
-                    <Button onClick={() => setOpenCreate(true)}>
-                        <Plus className="mr-2 h-4 w-4" />
-                        New Payroll
-                    </Button>
+                    <div className="space-x-4">
+                        <Button onClick={() => router.visit(`/deductions`)}>
+                            <HandCoins className="mr-2 h-4 w-4" />
+                            Manage Deductions
+                        </Button>
+                        <Button onClick={() => setOpenCreate(true)}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            New Payroll
+                        </Button>
+                    </div>
                 </div>
 
                 <Card>

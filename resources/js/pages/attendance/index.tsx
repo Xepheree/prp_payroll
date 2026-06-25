@@ -78,11 +78,11 @@ export default function Index() {
                                             Employees
                                         </TableHead>
 
+                                        <TableHead>Last Updated</TableHead>
+                                        <TableHead>Created</TableHead>
                                         <TableHead className="border-r">
                                             Status
                                         </TableHead>
-                                        <TableHead>Last Updated</TableHead>
-                                        <TableHead>Created</TableHead>
                                     </TableRow>
                                 </TableHeader>
 
@@ -119,12 +119,6 @@ export default function Index() {
                                                 {attendance.employees_count}
                                             </TableCell>
 
-                                            <TableCell className="border-r">
-                                                {getAttendanceStatusBadge(
-                                                    attendance.status,
-                                                )}
-                                            </TableCell>
-
                                             <TableCell>
                                                 {formatDateTime(
                                                     attendance.updated_at,
@@ -134,6 +128,11 @@ export default function Index() {
                                             <TableCell>
                                                 {formatDateTime(
                                                     attendance.created_at,
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="border-r">
+                                                {getAttendanceStatusBadge(
+                                                    attendance.status,
                                                 )}
                                             </TableCell>
                                         </TableRow>
