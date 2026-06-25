@@ -126,10 +126,7 @@ export default function Show() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>
-                            Employee Payroll : Next todo: fix the incentives:
-                            OT, Trips then the Cash Advances.
-                        </CardTitle>
+                        <CardTitle>Employee Payroll</CardTitle>
                     </CardHeader>
 
                     <CardContent>

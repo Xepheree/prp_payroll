@@ -24,6 +24,11 @@ return new class extends Migration
 
             $table->date('date');
 
+            $table->foreignId('payroll_id')
+                ->nullable()
+                ->constrained()
+                ->nullOnDelete();
+
             $table->text('remarks')
                 ->nullable();
 

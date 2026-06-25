@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Deduction;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Models\Trip;
@@ -141,7 +142,12 @@ class PayrollController extends Controller
                     $overtimeHours *
                     $employee->ot_rate;
 
-                $deductions = 0;
+                $deductions = Deduction::where('employee_id', $employee->id)
+                    ->whereBetween('date', [
+                        $attendance->period_start,
+                        $attendance->period_end,
+                    ])
+                    ->sum('amount');
 
                 $grossPay =
                     $basicPay +
@@ -149,7 +155,7 @@ class PayrollController extends Controller
                     $overtimePay;
 
                 $netPay =
-                    ($grossPay + $tripPay) -
+                    $grossPay -
                     $deductions;
 
                 /*
@@ -180,6 +186,16 @@ class PayrollController extends Controller
                     'gross_pay' => $grossPay,
                     'net_pay' => $netPay,
                 ]);
+
+                Deduction::where('employee_id', $employee->id)
+                    ->whereNull('payroll_id')
+                    ->whereBetween('date', [
+                        $attendance->period_start,
+                        $attendance->period_end,
+                    ])
+                    ->update([
+                        'payroll_id' => $payroll->id,
+                    ]);
             }
         });
 
