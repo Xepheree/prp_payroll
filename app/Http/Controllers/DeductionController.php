@@ -22,4 +22,96 @@ class DeductionController extends Controller
             )->get(),
         ]);
     }
+
+    public function store(Request $request)
+{
+    $validated = $request->validate([
+        'employee_id' => [
+            'required',
+            'exists:employees,id',
+        ],
+
+        'amount' => [
+            'required',
+            'numeric',
+            'min:0',
+        ],
+
+        'type' => [
+            'required',
+            'in:cash_advance,tax,benefits,others',
+        ],
+
+        'date' => [
+            'required',
+            'date',
+        ],
+
+        'remarks' => [
+            'nullable',
+            'string',
+        ],
+    ]);
+
+    Deduction::create($validated);
+
+    return redirect()
+        ->route('deductions.index')
+        ->with(
+            'success',
+            'Deduction created successfully.'
+        );
+}
+
+public function update(
+    Request $request,
+    Deduction $deduction
+) {
+    $validated = $request->validate([
+        'employee_id' => [
+            'required',
+            'exists:employees,id',
+        ],
+
+        'amount' => [
+            'required',
+            'numeric',
+            'min:0',
+        ],
+
+        'type' => [
+            'required',
+            'in:cash_advance,tax,benefits,others',
+        ],
+
+        'date' => [
+            'required',
+            'date',
+        ],
+
+        'remarks' => [
+            'nullable',
+            'string',
+        ],
+    ]);
+
+    $deduction->update($validated);
+
+    return redirect()
+        ->back()
+        ->with(
+            'success',
+            'Deduction updated successfully.'
+        );
+}
+
+public function destroy(Deduction $deduction)
+{
+    $deduction->delete();
+
+    return back()->with(
+        'success',
+        'Deduction deleted successfully.'
+    );
+}
 }

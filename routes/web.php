@@ -47,8 +47,7 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
     )->name('obs.update');
 
     // Deductions
-    Route::get('/deductions', [DeductionController::class, 'index'])
-        ->name('deductions.index');
+    Route::resource('deductions', DeductionController::class);
 
 
     // Payroll

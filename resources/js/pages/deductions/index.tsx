@@ -14,6 +14,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Plus } from 'lucide-react';
+import CreateDeductionModal from '@/components/custom/modals/deductions/CreateDeductionModal';
+import { format, formatDate } from 'date-fns';
 
 interface Employee {
     id: number;
@@ -41,6 +43,9 @@ interface PageProps {
 }
 
 export default function Index() {
+    const [openCreate, setOpenCreate] = useState(false);
+    const [selectedDeduction, setSelectedDeduction] = useState(null);
+
     const { deductions, employees } = usePage().props as {
         deductions: Deduction[];
         employees: Employee[];
@@ -75,7 +80,12 @@ export default function Index() {
                         </p>
                     </div>
 
-                    <Button onClick={() => setOpenCreate(true)}>
+                    <Button
+                        onClick={() => {
+                            setSelectedDeduction(null);
+                            setOpenCreate(true);
+                        }}
+                    >
                         <Plus className="mr-2 h-4 w-4" />
                         New Deduction
                     </Button>
@@ -86,7 +96,13 @@ export default function Index() {
                 {Object.entries(groupedDeductions).map(([date, items]) => (
                     <Card key={date}>
                         <CardHeader>
-                            <CardTitle>{formatDate(date)}</CardTitle>
+                            <CardTitle>
+                                {
+                                    <CardTitle>
+                                        {format(date, 'MMM dd, yyyy')}
+                                    </CardTitle>
+                                }
+                            </CardTitle>
                         </CardHeader>
 
                         <CardContent>
@@ -128,6 +144,12 @@ export default function Index() {
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
+                                                        onClick={() => {
+                                                            setSelectedDeduction(
+                                                                deduction,
+                                                            );
+                                                            setOpenCreate(true);
+                                                        }}
                                                     >
                                                         Edit
                                                     </Button>
@@ -135,6 +157,26 @@ export default function Index() {
                                                     <Button
                                                         variant="destructive"
                                                         size="sm"
+                                                        onClick={() => {
+                                                            if (
+                                                                !confirm(
+                                                                    'Delete this deduction?',
+                                                                )
+                                                            ) {
+                                                                return;
+                                                            }
+
+                                                            router.delete(
+                                                                `/deductions/${deduction.id}`,
+                                                                {
+                                                                    onSuccess:
+                                                                        () =>
+                                                                            toast.success(
+                                                                                'Deduction deleted successfully',
+                                                                            ),
+                                                                },
+                                                            );
+                                                        }}
                                                     >
                                                         Delete
                                                     </Button>
@@ -148,6 +190,13 @@ export default function Index() {
                     </Card>
                 ))}
             </div>
+
+            <CreateDeductionModal
+                openCreate={openCreate}
+                setOpenCreate={setOpenCreate}
+                employees={employees}
+                deduction={selectedDeduction}
+            />
         </>
     );
 }
