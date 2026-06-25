@@ -37,6 +37,9 @@ class TripController extends Controller
         }
 
         return Inertia::render('trips/index', [
+            'breadcrumbs' => [
+                ['title' => 'Trips', 'href' => '/trips'],
+            ],
             'trips' => $trips
                 ->latest('trip_date')
                 ->get(),

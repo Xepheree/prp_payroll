@@ -9,6 +9,10 @@ class BudgetController extends Controller
 {
     public function index()
     {
-        return Inertia::render('budget/index', []);
+        return Inertia::render('budget/index', [
+            'breadcrumbs' => [
+                ['title' => 'Budget', 'href' => '/budget'],
+            ]
+        ]);
     }
 }

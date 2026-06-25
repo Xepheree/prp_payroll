@@ -34,7 +34,11 @@ export default function Index() {
                     </div>
 
                     <div className="space-x-4">
-                        <Button onClick={() => router.visit(`/deductions`)}>
+                        <Button
+                            onClick={() =>
+                                router.visit('/deductions?from=payroll')
+                            }
+                        >
                             <HandCoins className="mr-2 h-4 w-4" />
                             Manage Deductions
                         </Button>
@@ -111,15 +115,6 @@ export default function Index() {
         </>
     );
 }
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Payroll',
-            href: '/payroll',
-        },
-    ],
-};
 
 export const getPayrollStatusBadge = (status: string) => {
     switch (status) {

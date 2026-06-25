@@ -166,12 +166,3 @@ export default function Index() {
         </>
     );
 }
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Companies',
-            href: '/companies',
-        },
-    ],
-};

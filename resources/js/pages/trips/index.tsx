@@ -256,12 +256,3 @@ export default function Index() {
         </>
     );
 }
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Trips',
-            href: '/trips',
-        },
-    ],
-};

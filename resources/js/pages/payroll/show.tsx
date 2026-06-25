@@ -215,15 +215,3 @@ export default function Show() {
         </>
     );
 }
-
-Show.layout = {
-    breadcrumbs: [
-        {
-            title: 'Payroll',
-            href: '/payroll',
-        },
-        {
-            title: 'View',
-        },
-    ],
-};

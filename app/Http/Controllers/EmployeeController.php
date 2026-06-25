@@ -12,6 +12,9 @@ class EmployeeController extends Controller
     public function index()
     {
         return Inertia::render('employees/index', [
+            'breadcrumbs' => [
+                ['title' => 'Employees', 'href' => '/employees'],
+            ],
             'employees' => Employee::all(),
         ]);
     }

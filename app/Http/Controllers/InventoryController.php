@@ -9,6 +9,10 @@ class InventoryController extends Controller
 {
     public function index()
     {
-        return Inertia::render('inventory/index', []);
+        return Inertia::render('inventory/index', [
+            'breadcrumbs' => [
+                ['title' => 'Inventory', 'href' => '/inventory'],
+            ]
+        ]);
     }
 }

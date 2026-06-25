@@ -217,12 +217,3 @@ export const getStatusBadge = (status) => {
             return <Badge variant="secondary">{status}</Badge>;
     }
 };
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Trucks',
-            href: '/trucks',
-        },
-    ],
-};

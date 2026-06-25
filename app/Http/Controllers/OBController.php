@@ -11,6 +11,9 @@ class OBController extends Controller
     public function index()
     {
         return Inertia::render('obs/index', [
+            'breadcrumbs' => [
+                ['title' => 'Outstanding Balances', 'href' => '/obs'],
+            ],
             'employees' => Employee::latest()
                 ->get(),
         ]);

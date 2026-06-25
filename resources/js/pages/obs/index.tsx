@@ -13,7 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Plus } from 'lucide-react';
+import { HandCoins, Plus } from 'lucide-react';
 
 interface Employee {
     id: number;
@@ -64,6 +64,15 @@ export default function Index() {
                         <p className="text-muted-foreground">
                             Employee balances and deductions.
                         </p>
+                    </div>
+
+                    <div className="space-x-4">
+                        <Button
+                            onClick={() => router.visit('/deductions?from=obs')}
+                        >
+                            <HandCoins className="mr-2 h-4 w-4" />
+                            Manage Deductions
+                        </Button>
                     </div>
                 </div>
 
@@ -205,12 +214,3 @@ export default function Index() {
         </>
     );
 }
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Outstanding Balances',
-            href: '/obs',
-        },
-    ],
-};

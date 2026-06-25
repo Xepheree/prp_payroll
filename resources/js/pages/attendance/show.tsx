@@ -328,18 +328,6 @@ export default function Show() {
     );
 }
 
-Show.layout = {
-    breadcrumbs: [
-        {
-            title: 'Attendance',
-            href: '/attendance',
-        },
-        {
-            title: 'View',
-        },
-    ],
-};
-
 // This function takes 3 colors and use the hours to calculate the ratio and return a blended color between red, yellow, and green. 0 hours is red, 8 hours is green, and anything above 8 hours is blue.
 const getAttendanceStyle = (hours: number) => {
     if (hours <= 4) {

@@ -9,12 +9,3 @@ export default function Index() {
         </>
     );
 }
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Budget',
-            href: '/budget',
-        },
-    ],
-};

@@ -9,6 +9,10 @@ class BillingsController extends Controller
 {
     public function index()
     {
-        return Inertia::render('billings/index', []);
+        return Inertia::render('billings/index', [
+            'breadcrumbs' => [
+                ['title' => 'Billings', 'href' => '/billings'],
+            ]
+        ]);
     }
 }

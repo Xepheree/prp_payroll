@@ -9,6 +9,10 @@ class CashFlowController extends Controller
 {
     public function index()
     {
-        return Inertia::render('cash-flow/index', []);
+        return Inertia::render('cash-flow/index', [
+            'breadcrumbs' => [
+                ['title' => 'Cash Flow', 'href' => '/cash-flow'],
+            ]
+        ]);
     }
 }

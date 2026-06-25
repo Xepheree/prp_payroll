@@ -12,6 +12,9 @@ class CompaniesController extends Controller
     public function index()
     {
         return Inertia::render('companies/index', [
+            'breadcrumbs' => [
+                ['title' => 'Companies', 'href' => '/companies'],
+            ],
             'companies' => Company::all(),
         ]);
     }

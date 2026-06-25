@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Models\Trip;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -15,6 +16,9 @@ class PayrollController extends Controller
     public function index()
     {
         return Inertia::render('payroll/index', [
+            'breadcrumbs' => [
+                ['title' => 'Payroll', 'href' => '/payroll'],
+            ],
             'payrolls' => Payroll::latest()->get(),
             'availableAttendances' => Attendance::where(
                 'status',
@@ -124,7 +128,7 @@ class PayrollController extends Controller
             */
 
 
-            
+
                 $basicPay =
                     $daysWorked *
                     $employee->rate;
@@ -198,7 +202,19 @@ class PayrollController extends Controller
             'payroll/show',
             [
                 'payroll' => $payroll,
-            ]
+                'breadcrumbs' => [
+                    [
+                        'title' => 'Payroll',
+                        'href' => '/payroll',
+                    ],
+                    [
+                        'title' => Carbon::parse($payroll->period_start)->format('M d')
+                            . ' → ' .
+                            Carbon::parse($payroll->period_end)->format('M d'),
+                    ],
+                ],
+            ],
+
         );
     }
 }

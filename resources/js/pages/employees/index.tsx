@@ -289,12 +289,3 @@ export const getEmployeeDesignationBadge = (designation) => (
         {designation}
     </Badge>
 );
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Employees',
-            href: '/employees',
-        },
-    ],
-};

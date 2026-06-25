@@ -16,6 +16,9 @@ class AttendanceController extends Controller
     public function index()
     {
         return Inertia::render('attendance/index', [
+            'breadcrumbs' => [
+                ['title' => 'Attendance', 'href' => '/attendance'],
+            ],
             'employees' => Employee::where(
                 'status',
                 'active'
@@ -139,6 +142,18 @@ class AttendanceController extends Controller
             'attendance' => $attendance,
             'dates' => $dates,
             'employees' => $employees,
+
+            'breadcrumbs' => [
+                [
+                    'title' => 'Attendance',
+                    'href' => '/attendance',
+                ],
+                [
+                    'title' => Carbon::parse($attendance->period_start)->format('M d')
+                        . ' → ' .
+                        Carbon::parse($attendance->period_end)->format('M d'),
+                ],
+            ],
         ]);
     }
 

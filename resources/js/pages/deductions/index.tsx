@@ -39,17 +39,16 @@ interface Deduction {
 }
 
 interface PageProps {
+    deductions: Deduction[];
     employees: Employee[];
+    from: string;
 }
 
 export default function Index() {
     const [openCreate, setOpenCreate] = useState(false);
     const [selectedDeduction, setSelectedDeduction] = useState(null);
 
-    const { deductions, employees } = usePage().props as {
-        deductions: Deduction[];
-        employees: Employee[];
-    };
+    const { deductions, employees } = usePage().props as PageProps;
 
     const groupedDeductions = deductions.reduce(
         (groups, deduction) => {
@@ -200,16 +199,3 @@ export default function Index() {
         </>
     );
 }
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Payroll',
-            href: '/payroll',
-        },
-        {
-            title: 'Deductions',
-            href: '/deductions',
-        },
-    ],
-};

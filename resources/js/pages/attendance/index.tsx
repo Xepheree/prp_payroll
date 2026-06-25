@@ -183,12 +183,3 @@ export const getAttendanceStatusBadge = (status) => {
             return <Badge variant="secondary">{status}</Badge>;
     }
 };
-
-Index.layout = {
-    breadcrumbs: [
-        {
-            title: 'Attendance',
-            href: '/attendance',
-        },
-    ],
-};

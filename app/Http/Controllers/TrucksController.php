@@ -12,6 +12,9 @@ class TrucksController extends Controller
     public function index()
     {
         return Inertia::render('trucks/index', [
+            'breadcrumbs' => [
+                ['title' => 'Trucks', 'href' => '/trucks'],
+            ],
             'trucks' => Truck::all(),
         ]);
     }
