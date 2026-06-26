@@ -76,6 +76,14 @@ class DeductionController extends Controller
         Request $request,
         Deduction $deduction
     ) {
+
+        if ($deduction->payroll_id !== null) {
+            return back()->withErrors([
+                'deduction' => 'This deduction has already been included in a payroll and can no longer be modified.',
+            ]);
+        }
+
+
         $validated = $request->validate([
             'employee_id' => [
                 'required',
@@ -116,6 +124,12 @@ class DeductionController extends Controller
 
     public function destroy(Deduction $deduction)
     {
+        if ($deduction->payroll_id !== null) {
+            return back()->withErrors([
+                'deduction' => 'This deduction has already been included in a payroll and can no longer be deleted.',
+            ]);
+        }
+
         $deduction->delete();
 
         return back()->with(

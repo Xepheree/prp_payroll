@@ -51,49 +51,24 @@ class PayrollController extends Controller
 
             $attendance = Attendance::with([
                 'items.employee',
-            ])->findOrFail(
-                $validated['attendance_id']
-            );
+            ])->findOrFail($validated['attendance_id']);
 
             $payroll = Payroll::create([
                 'attendance_id' => $attendance->id,
-                'start_date' => $attendance->period_start,
-                'end_date' => $attendance->period_end,
-                'status' => 'draft',
+                'start_date'    => $attendance->period_start,
+                'end_date'      => $attendance->period_end,
+                'status'        => 'draft',
             ]);
 
-            $employees = $attendance->items
-                ->groupBy('employee_id');
+            $employees = $attendance->items->groupBy('employee_id');
 
             foreach ($employees as $employeeItems) {
 
-                $employee = $employeeItems
-                    ->first()
-                    ->employee;
+                $employee = $employeeItems->first()->employee;
 
-                $deliveryCount = Trip::whereBetween(
-                    'trip_date',
-                    [
-                        $attendance->period_start,
-                        $attendance->period_end,
-                    ]
-                )
-                    ->where('trip_type', 'deliver')
-                    ->where(function ($query) use ($employee) {
-
-                        $query->where(
-                            'driver_id',
-                            $employee->id
-                        )
-                            ->orWhere(
-                                'helper_id',
-                                $employee->id
-                            );
-                    })
-                    ->count();
                 /*
             |--------------------------------------------------------------------------
-            | Attendance Computation
+            | Attendance Summary
             |--------------------------------------------------------------------------
             */
 
@@ -105,22 +80,52 @@ class PayrollController extends Controller
 
                     $hours = $item->work_hours;
 
-                    // Days Worked
                     if ($hours >= 8) {
                         $daysWorked += 1;
                     } elseif ($hours > 0) {
                         $daysWorked += $hours / 8;
                     }
 
-                    // Regular Hours (max 8/day)
                     $workHours += min(8, $hours);
 
-                    // Overtime Hours
-                    $overtimeHours += max(
-                        0,
-                        $hours - 8
-                    );
+                    $overtimeHours += max(0, $hours - 8);
                 }
+
+                /*
+            |--------------------------------------------------------------------------
+            | Trips
+            |--------------------------------------------------------------------------
+            */
+
+                $deliveries = Trip::whereNull('payroll_id')
+                    ->whereBetween('trip_date', [
+                        $attendance->period_start,
+                        $attendance->period_end,
+                    ])
+                    ->where('trip_type', 'deliver')
+                    ->where(function ($query) use ($employee) {
+                        $query->where('driver_id', $employee->id)
+                            ->orWhere('helper_id', $employee->id);
+                    })
+                    ->get();
+
+                $deliveryCount = $deliveries->count();
+
+                /*
+            |--------------------------------------------------------------------------
+            | Deductions
+            |--------------------------------------------------------------------------
+            */
+
+                $employeeDeductions = Deduction::whereNull('payroll_id')
+                    ->where('employee_id', $employee->id)
+                    ->whereBetween('date', [
+                        $attendance->period_start,
+                        $attendance->period_end,
+                    ])
+                    ->get();
+
+                $deductions = $employeeDeductions->sum('amount');
 
                 /*
             |--------------------------------------------------------------------------
@@ -128,74 +133,64 @@ class PayrollController extends Controller
             |--------------------------------------------------------------------------
             */
 
+                $basicPay = $daysWorked * $employee->rate;
 
+                $tripPay = $deliveryCount * ($employee->trip_rate ?? 0);
 
-                $basicPay =
-                    $daysWorked *
-                    $employee->rate;
+                $overtimePay = $overtimeHours * $employee->ot_rate;
 
-                $tripPay =
-                    $deliveryCount *
-                    ($employee->trip_rate ?? 0);
+                $grossPay = $basicPay + $tripPay + $overtimePay;
 
-                $overtimePay =
-                    $overtimeHours *
-                    $employee->ot_rate;
-
-                $deductions = Deduction::where('employee_id', $employee->id)
-                    ->whereBetween('date', [
-                        $attendance->period_start,
-                        $attendance->period_end,
-                    ])
-                    ->sum('amount');
-
-                $grossPay =
-                    $basicPay +
-                    $tripPay +
-                    $overtimePay;
-
-                $netPay =
-                    $grossPay -
-                    $deductions;
+                $netPay = $grossPay - $deductions;
 
                 /*
             |--------------------------------------------------------------------------
-            | Payroll Item Snapshot
+            | Payroll Snapshot
             |--------------------------------------------------------------------------
             */
 
                 PayrollItem::create([
-                    'payroll_id' => $payroll->id,
-                    'employee_id' => $employee->id,
+                    'payroll_id'      => $payroll->id,
+                    'employee_id'     => $employee->id,
 
-                    'daily_rate' => $employee->rate,
-                    'trip_rate' => $employee->trip_rate,
+                    'daily_rate'      => $employee->rate,
+                    'trip_rate'       => $employee->trip_rate,
 
-                    'days_worked' => round($daysWorked, 2),
-                    'work_hours' => $workHours,
-                    'overtime_hours' => $overtimeHours,
+                    'days_worked'     => round($daysWorked, 2),
+                    'work_hours'      => $workHours,
+                    'overtime_hours'  => $overtimeHours,
 
-                    'delivery_count' => $deliveryCount,
+                    'delivery_count'  => $deliveryCount,
 
-                    'basic_pay' => $basicPay,
-                    'trip_pay' => $tripPay,
-                    'overtime_pay' => $overtimePay,
+                    'basic_pay'       => $basicPay,
+                    'trip_pay'        => $tripPay,
+                    'overtime_pay'    => $overtimePay,
 
-                    'deductions' => $deductions,
+                    'deductions'      => $deductions,
 
-                    'gross_pay' => $grossPay,
-                    'net_pay' => $netPay,
+                    'gross_pay'       => $grossPay,
+                    'net_pay'         => $netPay,
                 ]);
 
-                Deduction::where('employee_id', $employee->id)
-                    ->whereNull('payroll_id')
-                    ->whereBetween('date', [
-                        $attendance->period_start,
-                        $attendance->period_end,
-                    ])
-                    ->update([
-                        'payroll_id' => $payroll->id,
-                    ]);
+                /*
+            |--------------------------------------------------------------------------
+            | Lock Trips & Deductions
+            |--------------------------------------------------------------------------
+            */
+
+                if ($deliveries->isNotEmpty()) {
+                    Trip::whereIn('id', $deliveries->pluck('id'))
+                        ->update([
+                            'payroll_id' => $payroll->id,
+                        ]);
+                }
+
+                if ($employeeDeductions->isNotEmpty()) {
+                    Deduction::whereIn('id', $employeeDeductions->pluck('id'))
+                        ->update([
+                            'payroll_id' => $payroll->id,
+                        ]);
+                }
             }
         });
 

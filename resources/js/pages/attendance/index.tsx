@@ -13,7 +13,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { formatDate } from '@/lib/utils';
+import { formatDate, formatDateTime } from '@/lib/utils';
 
 interface Attendance {
     id: number;
@@ -152,16 +152,6 @@ export default function Index() {
         </>
     );
 }
-
-const formatDateTime = (date: string) => {
-    return new Date(date).toLocaleString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-    });
-};
 
 export const getAttendanceStatusBadge = (status) => {
     switch (status) {

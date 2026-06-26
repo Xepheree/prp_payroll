@@ -39,7 +39,11 @@ function ViewTripModal({
 
                         <div className="flex items-center gap-2">
                             <img
-                                src={`/storage/${selectedTrip.truck?.image}`}
+                                src={
+                                    selectedTrip.truck?.image
+                                        ? `/storage/${selectedTrip.truck.image}`
+                                        : '/images/truck_placeholder.png'
+                                }
                                 alt={selectedTrip.truck?.alias}
                                 className="h-10 w-10 rounded-full object-cover"
                             />

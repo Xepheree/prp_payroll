@@ -19,6 +19,10 @@ export default function Index() {
     const [openCreate, setOpenCreate] = useState(false);
     const { payrolls, availableAttendances } = usePage().props;
 
+    /* Edge Cases:
+     1. Misinput in the attendance when published
+
+    */
     return (
         <>
             <Head title="Payroll" />

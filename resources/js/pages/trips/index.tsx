@@ -19,6 +19,8 @@ import {
 import ViewTripModal from '@/components/custom/modals/trip/ViewTripModal';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
+import { formatDate } from '@/lib/utils';
 
 export default function Index() {
     const { trips, filters, employees, trucks, flash } = usePage()
@@ -166,7 +168,14 @@ export default function Index() {
 
                                     <TableBody>
                                         {trips.map((trip) => (
-                                            <TableRow key={trip.id}>
+                                            <TableRow
+                                                key={trip.id}
+                                                onClick={() => {
+                                                    console.log(trip);
+                                                    setSelectedTrip(trip);
+                                                    setOpenView(true);
+                                                }}
+                                            >
                                                 <TableCell className="border-r">
                                                     {trip.trip_date}
                                                 </TableCell>
@@ -190,38 +199,128 @@ export default function Index() {
 
                                                 <TableCell>
                                                     <div className="flex gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                console.log(
-                                                                    trip,
-                                                                );
-                                                                setSelectedTrip(
-                                                                    trip,
-                                                                );
-                                                                setOpenView(
-                                                                    true,
-                                                                );
-                                                            }}
-                                                        >
-                                                            View
-                                                        </Button>
+                                                        {trip.payroll_id !==
+                                                        null ? (
+                                                            <div className="rounded-md border border-green-500 bg-green-500/20 px-3 py-1 text-center">
+                                                                <p className="text-sm font-medium text-green-500">
+                                                                    Included in
+                                                                    Payroll
+                                                                </p>
 
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => {
-                                                                setEditingTrip(
-                                                                    trip,
-                                                                );
-                                                                setOpenCreate(
-                                                                    true,
-                                                                );
-                                                            }}
-                                                        >
-                                                            Edit
-                                                        </Button>
+                                                                <p className="text-xs text-muted-foreground">
+                                                                    {formatDate(
+                                                                        trip
+                                                                            .payroll
+                                                                            .start_date,
+                                                                    )}{' '}
+                                                                    –{' '}
+                                                                    {formatDate(
+                                                                        trip
+                                                                            .payroll
+                                                                            .end_date,
+                                                                    )}
+                                                                </p>
+                                                            </div>
+                                                        ) : trip.is_late_filing ? (
+                                                            <div
+                                                                onClick={(
+                                                                    e,
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    console.log(
+                                                                        'Generate Voucher',
+                                                                    );
+                                                                }}
+                                                                className="cursor-pointer rounded-md border border-amber-500 bg-amber-500/20 px-3 py-1 text-center hover:bg-amber-500/30"
+                                                            >
+                                                                <div className="flex flex-col">
+                                                                    <p className="text-sm font-medium text-amber-500">
+                                                                        Generate
+                                                                        Voucher
+                                                                    </p>
+                                                                    <p className="text-xs text-muted-foreground">
+                                                                        Late
+                                                                        Filing
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingTrip(
+                                                                            trip,
+                                                                        );
+                                                                        setOpenCreate(
+                                                                            true,
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    Edit
+                                                                </Button>
+
+                                                                <Button
+                                                                    variant="destructive"
+                                                                    size="sm"
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+
+                                                                        if (
+                                                                            !confirm(
+                                                                                'Are you sure you want to delete this trip?',
+                                                                            )
+                                                                        ) {
+                                                                            return;
+                                                                        }
+
+                                                                        router.delete(
+                                                                            `/trips/${trip.id}`,
+                                                                            {
+                                                                                preserveScroll: true,
+
+                                                                                onSuccess:
+                                                                                    () => {
+                                                                                        toast.success(
+                                                                                            'Trip deleted successfully',
+                                                                                        );
+                                                                                    },
+
+                                                                                onError:
+                                                                                    (
+                                                                                        errors,
+                                                                                    ) => {
+                                                                                        const firstError =
+                                                                                            Object.values(
+                                                                                                errors,
+                                                                                            )[0];
+
+                                                                                        if (
+                                                                                            firstError
+                                                                                        ) {
+                                                                                            toast.error(
+                                                                                                firstError as string,
+                                                                                            );
+                                                                                        } else {
+                                                                                            toast.error(
+                                                                                                'Unable to delete trip.',
+                                                                                            );
+                                                                                        }
+                                                                                    },
+                                                                            },
+                                                                        );
+                                                                    }}
+                                                                >
+                                                                    Delete
+                                                                </Button>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </TableCell>
                                             </TableRow>

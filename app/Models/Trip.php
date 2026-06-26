@@ -34,4 +34,9 @@ class Trip extends Model
     {
         return $this->belongsTo(Employee::class, 'helper_id');
     }
+
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
+    }
 }

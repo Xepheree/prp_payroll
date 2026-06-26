@@ -31,6 +31,7 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface Attendance {
     id: number;
@@ -122,6 +123,7 @@ export default function Show() {
     };
 
     const [publishOpen, setPublishOpen] = useState(false);
+    const [reviewed, setReviewed] = useState(false);
 
     return (
         <>
@@ -170,15 +172,23 @@ export default function Show() {
                                 </p>
                             </div>
                             <div className="flex gap-2">
-                                <Button
-                                    onClick={updateAttendance}
-                                    disabled={
-                                        !hasChanges ||
-                                        attendance.status === 'published'
-                                    }
-                                >
-                                    Update Attendance
-                                </Button>
+                                {attendance.status === 'published' ? (
+                                    <div className="flex items-center gap-2 rounded-md border border-green-500 bg-green-500/20 px-4 py-2">
+                                        <span className="text-sm text-green-500">
+                                            Attendance published
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <Button
+                                        onClick={updateAttendance}
+                                        disabled={
+                                            !hasChanges ||
+                                            attendance.status === 'published'
+                                        }
+                                    >
+                                        Update Attendance
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </CardHeader>
@@ -303,7 +313,16 @@ export default function Show() {
                 </Card>
             </div>
 
-            <AlertDialog open={publishOpen} onOpenChange={setPublishOpen}>
+            <AlertDialog
+                open={publishOpen}
+                onOpenChange={(open) => {
+                    setPublishOpen(open);
+
+                    if (!open) {
+                        setReviewed(false);
+                    }
+                }}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Publish Attendance?</AlertDialogTitle>
@@ -315,10 +334,32 @@ export default function Show() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
+                    <div className="flex items-start space-x-2 py-2">
+                        <Checkbox
+                            className="mt-1"
+                            id="reviewed"
+                            checked={reviewed}
+                            onCheckedChange={(checked) =>
+                                setReviewed(checked === true)
+                            }
+                        />
+
+                        <label
+                            htmlFor="reviewed"
+                            className="text-sm leading-relaxed"
+                        >
+                            I have reviewed the attendance data and confirm that
+                            all work hours are correct.
+                        </label>
+                    </div>
+
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-                        <AlertDialogAction onClick={publishAttendance}>
+                        <AlertDialogAction
+                            disabled={!reviewed}
+                            onClick={publishAttendance}
+                        >
                             Publish
                         </AlertDialogAction>
                     </AlertDialogFooter>

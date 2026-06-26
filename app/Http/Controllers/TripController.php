@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Payroll;
 use App\Models\Trip;
 use App\Models\Truck;
 use Inertia\Inertia;
@@ -18,6 +19,7 @@ class TripController extends Controller
             'truck',
             'driver',
             'helper',
+            'payroll',
         ]);
 
         if ($request->filled('start_date')) {
@@ -42,7 +44,17 @@ class TripController extends Controller
             ],
             'trips' => $trips
                 ->latest('trip_date')
-                ->get(),
+                ->get()
+                ->map(function ($trip) {
+
+                    $trip->is_late_filing =
+                        $trip->payroll_id === null &&
+                        Payroll::whereDate('start_date', '<=', $trip->trip_date)
+                        ->whereDate('end_date', '>=', $trip->trip_date)
+                        ->exists();
+
+                    return $trip;
+                }),
 
             'employees' => Employee::where(
                 'status',
@@ -95,6 +107,12 @@ class TripController extends Controller
 
     public function update(Request $request, Trip $trip)
     {
+        if ($trip->payroll_id !== null) {
+            return back()->withErrors([
+                'trip' => 'This trip has already been included in a payroll and can no longer be modified.',
+            ]);
+        }
+
         $validated = $request->validate([
             'trip_date' => ['required', 'date'],
             'truck_id' => ['required', 'exists:trucks,id'],
@@ -105,6 +123,25 @@ class TripController extends Controller
 
         $trip->update($validated);
 
-        return redirect()->back();
+        return back()->with(
+            'success',
+            'Trip updated successfully.'
+        );
+    }
+
+    public function destroy(Trip $trip)
+    {
+        if ($trip->payroll_id !== null) {
+            return back()->withErrors([
+                'trip' => 'This trip has already been included in a payroll and cannot be deleted.',
+            ]);
+        }
+
+        $trip->delete();
+
+        return back()->with(
+            'success',
+            'Trip deleted successfully.'
+        );
     }
 }
