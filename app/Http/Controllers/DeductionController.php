@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Deduction;
+use App\Models\Payroll;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,23 +12,59 @@ class DeductionController extends Controller
 {
     public function index()
     {
+        $deductions = Deduction::with([
+            'employee',
+            'payroll',
+        ])
+            ->latest('date')
+            ->get()
+            ->map(function ($deduction) {
+
+                $deduction->can_add_to_balance =
+                    $deduction->payroll_id === null &&
+                    Payroll::whereDate(
+                        'start_date',
+                        '<=',
+                        $deduction->date
+                    )
+                    ->whereDate(
+                        'end_date',
+                        '>=',
+                        $deduction->date
+                    )
+                    ->exists();
+
+                return $deduction;
+            });
+
         return Inertia::render('deductions/index', [
-            'deductions' => Deduction::with('employee')
-                ->latest('date')
-                ->get(),
+            'deductions' => $deductions,
 
             'employees' => Employee::where(
                 'status',
                 'active'
             )->get(),
+
             'breadcrumbs' => request('from') === 'payroll'
                 ? [
-                    ['title' => 'Payroll', 'href' => '/payroll'],
-                    ['title' => 'Deductions', 'href' => '/deductions?from=payroll'],
+                    [
+                        'title' => 'Payroll',
+                        'href' => '/payroll',
+                    ],
+                    [
+                        'title' => 'Deductions',
+                        'href' => '/deductions?from=payroll',
+                    ],
                 ]
                 : [
-                    ['title' => 'Outstanding Balances', 'href' => '/obs'],
-                    ['title' => 'Deductions', 'href' => '/deductions?from=obs'],
+                    [
+                        'title' => 'Outstanding Balances',
+                        'href' => '/obs',
+                    ],
+                    [
+                        'title' => 'Deductions',
+                        'href' => '/deductions?from=obs',
+                    ],
                 ],
         ]);
     }

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Plus } from 'lucide-react';
 import CreateDeductionModal from '@/components/custom/modals/deductions/CreateDeductionModal';
-import { format, formatDate } from 'date-fns';
+import { formatDate, formatDateTime } from '@/lib/utils';
 
 interface Employee {
     id: number;
@@ -31,11 +31,19 @@ interface Deduction {
     type: string;
     date: string;
     remarks: string | null;
+    payroll_id: number | null;
+    can_add_to_balance: boolean;
 
     employee: {
         id: number;
         name: string;
     };
+
+    payroll: {
+        id: number;
+        start_date: string;
+        end_date: string;
+    } | null;
 }
 
 interface PageProps {
@@ -46,9 +54,10 @@ interface PageProps {
 
 export default function Index() {
     const [openCreate, setOpenCreate] = useState(false);
-    const [selectedDeduction, setSelectedDeduction] = useState(null);
+    const [selectedDeduction, setSelectedDeduction] =
+        useState<Deduction | null>(null);
 
-    const { deductions, employees } = usePage().props as PageProps;
+    const { deductions, employees } = usePage().props as unknown as PageProps;
 
     const groupedDeductions = deductions.reduce(
         (groups, deduction) => {
@@ -92,53 +101,171 @@ export default function Index() {
             </div>
 
             <div>
-                {Object.entries(groupedDeductions).map(([date, items]) => (
-                    <Card key={date}>
-                        <CardHeader>
-                            <CardTitle>
-                                {
-                                    <CardTitle>
-                                        {format(date, 'MMM dd, yyyy')}
-                                    </CardTitle>
-                                }
-                            </CardTitle>
-                        </CardHeader>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>All Deductions</CardTitle>
+                    </CardHeader>
 
-                        <CardContent>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Employee</TableHead>
-                                        <TableHead>Type</TableHead>
-                                        <TableHead>Amount</TableHead>
-                                        <TableHead>Remarks</TableHead>
-                                        <TableHead>Actions</TableHead>
-                                    </TableRow>
-                                </TableHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Employee</TableHead>
+                                    <TableHead>Type</TableHead>
+                                    <TableHead>Amount</TableHead>
+                                    <TableHead>Remarks</TableHead>
+                                    <TableHead>Actions</TableHead>
+                                </TableRow>
+                            </TableHeader>
 
-                                <TableBody>
-                                    {items.map((deduction) => (
-                                        <TableRow key={deduction.id}>
-                                            <TableCell>
-                                                {deduction.employee.name}
-                                            </TableCell>
+                            <TableBody>
+                                {deductions.map((deduction) => (
+                                    <TableRow key={deduction.id}>
+                                        <TableCell>
+                                            {formatDate(deduction.date)}
+                                        </TableCell>
 
-                                            <TableCell>
-                                                {deduction.type}
-                                            </TableCell>
+                                        <TableCell>
+                                            {deduction.employee.name}
+                                        </TableCell>
 
-                                            <TableCell>
-                                                ₱
-                                                {Number(
-                                                    deduction.amount,
-                                                ).toLocaleString()}
-                                            </TableCell>
+                                        <TableCell className="capitalize">
+                                            {deduction.type.replace('_', ' ')}
+                                        </TableCell>
 
-                                            <TableCell>
-                                                {deduction.remarks}
-                                            </TableCell>
+                                        <TableCell>
+                                            ₱
+                                            {Number(
+                                                deduction.amount,
+                                            ).toLocaleString()}
+                                        </TableCell>
 
-                                            <TableCell>
+                                        <TableCell>
+                                            {deduction.remarks || '-'}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {deduction.payroll ? (
+                                                <div
+                                                    className="rounded-md border border-green-500 bg-green-500/20 px-3 py-1 text-center"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+
+                                                        router.visit(
+                                                            `/payroll/${deduction.payroll!.id}`,
+                                                        );
+                                                    }}
+                                                >
+                                                    <p className="text-sm font-semibold text-green-600">
+                                                        Included in Payroll
+                                                    </p>
+
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {formatDate(
+                                                            deduction.payroll
+                                                                .start_date,
+                                                        )}{' '}
+                                                        –{' '}
+                                                        {formatDate(
+                                                            deduction.payroll
+                                                                .end_date,
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            ) : deduction.can_add_to_balance ? (
+                                                <div
+                                                    className="rounded-md border border-amber-500 bg-amber-500/20 px-3 py-1 text-center"
+                                                    onClick={() => {
+                                                        const employee =
+                                                            employees.find(
+                                                                (employee) =>
+                                                                    employee.id ===
+                                                                    deduction.employee_id,
+                                                            );
+
+                                                        if (!employee) {
+                                                            toast.error(
+                                                                'Employee not found.',
+                                                            );
+
+                                                            return;
+                                                        }
+
+                                                        router.patch(
+                                                            `/obs/${deduction.employee_id}`,
+                                                            {
+                                                                balance:
+                                                                    Number(
+                                                                        employee.balance ??
+                                                                            0,
+                                                                    ) +
+                                                                    Number(
+                                                                        deduction.amount,
+                                                                    ),
+                                                            },
+                                                            {
+                                                                preserveScroll: true,
+
+                                                                onSuccess:
+                                                                    () => {
+                                                                        router.delete(
+                                                                            `/deductions/${deduction.id}`,
+                                                                            {
+                                                                                preserveScroll: true,
+
+                                                                                onSuccess:
+                                                                                    () =>
+                                                                                        toast.success(
+                                                                                            'Deduction moved to employee balance.',
+                                                                                        ),
+
+                                                                                onError:
+                                                                                    (
+                                                                                        errors,
+                                                                                    ) => {
+                                                                                        const firstError =
+                                                                                            Object.values(
+                                                                                                errors,
+                                                                                            )[0];
+
+                                                                                        toast.error(
+                                                                                            firstError
+                                                                                                ? (firstError as string)
+                                                                                                : 'Failed to remove deduction.',
+                                                                                        );
+                                                                                    },
+                                                                            },
+                                                                        );
+                                                                    },
+
+                                                                onError: (
+                                                                    errors,
+                                                                ) => {
+                                                                    const firstError =
+                                                                        Object.values(
+                                                                            errors,
+                                                                        )[0];
+
+                                                                    toast.error(
+                                                                        firstError
+                                                                            ? (firstError as string)
+                                                                            : 'Failed to update balance.',
+                                                                    );
+                                                                },
+                                                            },
+                                                        );
+                                                    }}
+                                                >
+                                                    <p className="text-sm font-medium text-amber-500">
+                                                        Add to balance
+                                                    </p>
+
+                                                    <p className="text-xs text-muted-foreground">
+                                                        Late Filing
+                                                    </p>
+                                                </div>
+                                            ) : (
                                                 <div className="flex gap-2">
                                                     <Button
                                                         variant="outline"
@@ -168,11 +295,30 @@ export default function Index() {
                                                             router.delete(
                                                                 `/deductions/${deduction.id}`,
                                                                 {
+                                                                    preserveScroll: true,
+
                                                                     onSuccess:
                                                                         () =>
                                                                             toast.success(
                                                                                 'Deduction deleted successfully',
                                                                             ),
+
+                                                                    onError: (
+                                                                        errors,
+                                                                    ) => {
+                                                                        const firstError =
+                                                                            Object.values(
+                                                                                errors,
+                                                                            )[0];
+
+                                                                        if (
+                                                                            firstError
+                                                                        ) {
+                                                                            toast.error(
+                                                                                firstError as string,
+                                                                            );
+                                                                        }
+                                                                    },
                                                                 },
                                                             );
                                                         }}
@@ -180,14 +326,14 @@ export default function Index() {
                                                         Delete
                                                     </Button>
                                                 </div>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </CardContent>
-                    </Card>
-                ))}
+                                            )}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </div>
 
             <CreateDeductionModal

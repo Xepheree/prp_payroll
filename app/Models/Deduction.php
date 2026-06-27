@@ -23,4 +23,9 @@ class Deduction extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+
+    public function payroll()
+    {
+        return $this->belongsTo(Payroll::class);
+    }
 }
