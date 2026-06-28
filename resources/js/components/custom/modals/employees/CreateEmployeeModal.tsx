@@ -26,6 +26,7 @@ function CreateEmployeeModal({
 }: {
     openCreate: boolean;
     setOpenCreate: any;
+    employee?: any;
 }) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreview, setImagePreview] = useState('');
@@ -136,6 +137,19 @@ function CreateEmployeeModal({
         }
     }, [employee]);
 
+    const roles = [
+        'driver',
+        'helper',
+        'cutter',
+        'checker',
+        'dispatcher',
+        'sorter',
+        'presser',
+        'guard',
+        'hr',
+        'finance',
+    ];
+
     return (
         <Dialog open={openCreate} onOpenChange={setOpenCreate}>
             <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-xl">
@@ -209,27 +223,12 @@ function CreateEmployeeModal({
                             </SelectTrigger>
 
                             <SelectContent>
-                                <SelectItem value="driver">Driver</SelectItem>
-
-                                <SelectItem value="helper">Helper</SelectItem>
-
-                                <SelectItem value="cutter">Cutter</SelectItem>
-
-                                <SelectItem value="checker">Checker</SelectItem>
-
-                                <SelectItem value="dispatcher">
-                                    Dispatcher
-                                </SelectItem>
-
-                                <SelectItem value="sorter">Sorter</SelectItem>
-
-                                <SelectItem value="presser">Presser</SelectItem>
-
-                                <SelectItem value="guard">Guard</SelectItem>
-
-                                <SelectItem value="hr">HR</SelectItem>
-
-                                <SelectItem value="finance">Finance</SelectItem>
+                                {roles.map((role) => (
+                                    <SelectItem key={role} value={role}>
+                                        {role.charAt(0).toUpperCase() +
+                                            role.slice(1)}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
@@ -314,14 +313,6 @@ function CreateEmployeeModal({
                         Cancel
                     </Button>
 
-                    {/* <Button
-                        onClick={() => {
-                            console.log(form);
-                            setOpenCreate(false);
-                        }}
-                    >
-                        Save Employee
-                    </Button> */}
                     <Button onClick={submit}>
                         {isEditing ? 'Update Employee' : 'Save Employee'}
                     </Button>
