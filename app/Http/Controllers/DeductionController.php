@@ -174,4 +174,27 @@ class DeductionController extends Controller
             'Deduction deleted successfully.'
         );
     }
+
+    public function addToBalance(Deduction $deduction)
+    {
+        if ($deduction->added_to_balance) {
+            return back()->withErrors([
+                'deduction' => 'This deduction has already been added to the employee balance.',
+            ]);
+        }
+
+        $employee = $deduction->employee;
+
+        $employee->increment('balance', $deduction->amount);
+
+        $deduction->update([
+            'added_to_balance' => true,
+            'added_to_balance_at' => now(),
+        ]);
+
+        return back()->with(
+            'success',
+            'Deduction added to employee balance successfully.'
+        );
+    }
 }

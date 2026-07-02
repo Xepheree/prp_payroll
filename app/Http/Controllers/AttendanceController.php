@@ -64,7 +64,6 @@ class AttendanceController extends Controller
             $attendance = Attendance::create([
                 'period_start' => $validated['period_start'],
                 'period_end' => $validated['period_end'],
-                'status' => 'draft',
             ]);
 
             $period = CarbonPeriod::create(
@@ -105,6 +104,7 @@ class AttendanceController extends Controller
     {
         $attendance->load([
             'items.employee',
+            'payroll',
         ]);
 
         $dates = collect(
@@ -142,7 +142,9 @@ class AttendanceController extends Controller
             'attendance' => $attendance,
             'dates' => $dates,
             'employees' => $employees,
-
+            'is_locked' =>
+            $attendance->payroll &&
+                $attendance->payroll->status === 'finalized',
             'breadcrumbs' => [
                 [
                     'title' => 'Attendance',
@@ -178,25 +180,6 @@ class AttendanceController extends Controller
         return back()->with(
             'success',
             'Attendance updated successfully.'
-        );
-    }
-
-    public function publish(
-        Attendance $attendance
-    ) {
-        if ($attendance->status === 'published') {
-            return back()->withErrors([
-                'attendance' => 'Attendance already published.',
-            ]);
-        }
-
-        $attendance->update([
-            'status' => 'published',
-        ]);
-
-        return back()->with(
-            'success',
-            'Attendance published successfully.'
         );
     }
 }

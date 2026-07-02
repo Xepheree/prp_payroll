@@ -37,7 +37,6 @@ interface Attendance {
     id: number;
     period_start: string;
     period_end: string;
-    status: string;
 }
 
 interface Employee {
@@ -56,12 +55,12 @@ interface Employee {
 }
 
 export default function Show() {
-    const { attendance, dates, employees } = usePage().props as {
+    const { attendance, dates, employees, is_locked } = usePage().props as {
         attendance: Attendance;
         dates: string[];
         employees: Employee[];
+        is_locked: boolean;
     };
-
     const initialAttendanceData = employees.reduce((data, employee) => {
         dates.forEach((date) => {
             const item = employee.attendance[date];
@@ -110,21 +109,6 @@ export default function Show() {
         );
     };
 
-    const publishAttendance = () => {
-        router.patch(
-            `/attendance/${attendance.id}/publish`,
-            {},
-            {
-                onSuccess: () => {
-                    toast.success('Attendance published successfully');
-                },
-            },
-        );
-    };
-
-    const [publishOpen, setPublishOpen] = useState(false);
-    const [reviewed, setReviewed] = useState(false);
-
     return (
         <>
             <Head title="Attendance Details" />
@@ -167,24 +151,30 @@ export default function Show() {
                         <div className="flex items-center justify-between">
                             <div className="flex flex-col space-y-1">
                                 <CardTitle>Work Hours</CardTitle>
-                                <p className="text-sm text-muted-foreground">
-                                    Input attendance details for each employee
-                                </p>
+                                {is_locked ? (
+                                    <p className="text-sm text-muted-foreground">
+                                        This attendance is locked because its
+                                        payroll has been finalized.
+                                    </p>
+                                ) : (
+                                    <p className="text-sm text-muted-foreground">
+                                        Changes made here are automatically
+                                        reflected in any draft payroll for this
+                                        attendance.
+                                    </p>
+                                )}
                             </div>
                             <div className="flex gap-2">
-                                {attendance.status === 'published' ? (
+                                {is_locked ? (
                                     <div className="flex items-center gap-2 rounded-md border border-green-500 bg-green-500/20 px-4 py-2">
-                                        <span className="text-sm text-green-500">
-                                            Attendance published
+                                        <span className="font-medium text-green-600">
+                                            Payroll Finalized
                                         </span>
                                     </div>
                                 ) : (
                                     <Button
                                         onClick={updateAttendance}
-                                        disabled={
-                                            !hasChanges ||
-                                            attendance.status === 'published'
-                                        }
+                                        disabled={!hasChanges}
                                     >
                                         Update Attendance
                                     </Button>
@@ -258,10 +248,7 @@ export default function Show() {
                                                                     },
                                                                 );
                                                             }}
-                                                            disabled={
-                                                                attendance.status ===
-                                                                'published'
-                                                            }
+                                                            disabled={is_locked}
                                                             type="number"
                                                             min="0"
                                                             max="24"
@@ -299,21 +286,11 @@ export default function Show() {
                                 </TableBody>
                             </Table>
                         </div>
-                        <div className="mt-5 flex justify-end">
-                            {attendance.status === 'draft' && (
-                                <Button
-                                    onClick={() => setPublishOpen(true)}
-                                    disabled={hasChanges}
-                                >
-                                    Publish
-                                </Button>
-                            )}
-                        </div>
                     </CardContent>
                 </Card>
             </div>
 
-            <AlertDialog
+            {/* <AlertDialog
                 open={publishOpen}
                 onOpenChange={(open) => {
                     setPublishOpen(open);
@@ -364,7 +341,7 @@ export default function Show() {
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
-            </AlertDialog>
+            </AlertDialog> */}
         </>
     );
 }

@@ -24,6 +24,9 @@ return new class extends Migration
 
             $table->date('date');
 
+            $table->boolean('added_to_balance')->default(false);
+            $table->timestamp('added_to_balance_at')->nullable();
+
             $table->text('remarks')
                 ->nullable();
 

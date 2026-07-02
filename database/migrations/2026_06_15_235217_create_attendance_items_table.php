@@ -32,11 +32,10 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->unique([
-                'attendance_id',
-                'employee_id',
-                'attendance_date',
-            ]);
+            $table->unique(
+                ['attendance_id', 'employee_id', 'attendance_date'],
+                'attendance_item_unique'
+            );
         });
     }
 

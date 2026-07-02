@@ -2,6 +2,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import CreateAttendanceModal from '@/components/custom/modals/attendance/CreateAttendanceModal';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -12,7 +13,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { formatDate, formatDateTime } from '@/lib/utils';
 
 interface Attendance {
@@ -42,7 +42,7 @@ export default function Index() {
 
     return (
         <>
-            <Head title="Trips" />
+            <Head title="Attendance" />
 
             <div className="space-y-6 p-6">
                 <div className="flex items-center justify-between">
@@ -80,9 +80,6 @@ export default function Index() {
 
                                         <TableHead>Last Updated</TableHead>
                                         <TableHead>Created</TableHead>
-                                        <TableHead className="border-r">
-                                            Status
-                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
 
@@ -128,11 +125,6 @@ export default function Index() {
                                             <TableCell>
                                                 {formatDateTime(
                                                     attendance.created_at,
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="border-r">
-                                                {getAttendanceStatusBadge(
-                                                    attendance.status,
                                                 )}
                                             </TableCell>
                                         </TableRow>

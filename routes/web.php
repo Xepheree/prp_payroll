@@ -48,14 +48,17 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // Deductions
     Route::resource('deductions', DeductionController::class);
-
+    Route::post(
+        '/deductions/{deduction}/balance',
+        [DeductionController::class, 'addToBalance']
+    )->name('deductions.balance');
 
     // Payroll
     Route::resource('payroll', PayrollController::class);
-    Route::get(
-        '/payroll/deductions',
-        [AttendanceController::class, 'publish']
-    )->name('attendance.publish');
+    Route::post(
+        '/payroll/{payroll}/finalize',
+        [PayrollController::class, 'finalize']
+    )->name('payroll.finalize');
 
     // Billings
     Route::resource('billings', BillingsController::class);

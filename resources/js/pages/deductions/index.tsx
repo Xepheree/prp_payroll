@@ -1,4 +1,5 @@
 import { Head, router, usePage } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import EmptyState from '@/components/custom/EmptyState';
@@ -13,7 +14,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Plus } from 'lucide-react';
 import CreateDeductionModal from '@/components/custom/modals/deductions/CreateDeductionModal';
 import { formatDate, formatDateTime } from '@/lib/utils';
 
@@ -73,6 +73,63 @@ export default function Index() {
         },
         {} as Record<string, Deduction[]>,
     );
+
+    const addToBalance = (
+        employee_id: number,
+        amount: number,
+        deductionid: number,
+    ) => {
+        const employee = employees.find(
+            (employee) => employee.id === employee_id,
+        );
+
+        if (!employee) {
+            toast.error('Employee not found.');
+
+            return;
+        }
+
+        router.patch(
+            `/obs/${employee_id}`,
+            {
+                balance: Number(employee.balance ?? 0) + Number(amount),
+            },
+            {
+                preserveScroll: true,
+
+                onSuccess: () => {
+                    router.delete(`/deductions/${deductionid}`, {
+                        preserveScroll: true,
+
+                        onSuccess: () =>
+                            toast.success(
+                                'Deduction moved to employee balance.',
+                            ),
+
+                        onError: (errors) => {
+                            const firstError = Object.values(errors)[0];
+
+                            toast.error(
+                                firstError
+                                    ? (firstError as string)
+                                    : 'Failed to remove deduction.',
+                            );
+                        },
+                    });
+                },
+
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+
+                    toast.error(
+                        firstError
+                            ? (firstError as string)
+                            : 'Failed to update balance.',
+                    );
+                },
+            },
+        );
+    };
 
     return (
         <>
@@ -177,83 +234,10 @@ export default function Index() {
                                                 <div
                                                     className="rounded-md border border-amber-500 bg-amber-500/20 px-3 py-1 text-center"
                                                     onClick={() => {
-                                                        const employee =
-                                                            employees.find(
-                                                                (employee) =>
-                                                                    employee.id ===
-                                                                    deduction.employee_id,
-                                                            );
-
-                                                        if (!employee) {
-                                                            toast.error(
-                                                                'Employee not found.',
-                                                            );
-
-                                                            return;
-                                                        }
-
-                                                        router.patch(
-                                                            `/obs/${deduction.employee_id}`,
-                                                            {
-                                                                balance:
-                                                                    Number(
-                                                                        employee.balance ??
-                                                                            0,
-                                                                    ) +
-                                                                    Number(
-                                                                        deduction.amount,
-                                                                    ),
-                                                            },
-                                                            {
-                                                                preserveScroll: true,
-
-                                                                onSuccess:
-                                                                    () => {
-                                                                        router.delete(
-                                                                            `/deductions/${deduction.id}`,
-                                                                            {
-                                                                                preserveScroll: true,
-
-                                                                                onSuccess:
-                                                                                    () =>
-                                                                                        toast.success(
-                                                                                            'Deduction moved to employee balance.',
-                                                                                        ),
-
-                                                                                onError:
-                                                                                    (
-                                                                                        errors,
-                                                                                    ) => {
-                                                                                        const firstError =
-                                                                                            Object.values(
-                                                                                                errors,
-                                                                                            )[0];
-
-                                                                                        toast.error(
-                                                                                            firstError
-                                                                                                ? (firstError as string)
-                                                                                                : 'Failed to remove deduction.',
-                                                                                        );
-                                                                                    },
-                                                                            },
-                                                                        );
-                                                                    },
-
-                                                                onError: (
-                                                                    errors,
-                                                                ) => {
-                                                                    const firstError =
-                                                                        Object.values(
-                                                                            errors,
-                                                                        )[0];
-
-                                                                    toast.error(
-                                                                        firstError
-                                                                            ? (firstError as string)
-                                                                            : 'Failed to update balance.',
-                                                                    );
-                                                                },
-                                                            },
+                                                        addToBalance(
+                                                            deduction.employee_id,
+                                                            deduction.amount,
+                                                            deduction.id,
                                                         );
                                                     }}
                                                 >
@@ -268,7 +252,7 @@ export default function Index() {
                                             ) : (
                                                 <div className="flex gap-2">
                                                     <Button
-                                                        variant="outline"
+                                                        className="cursor-pointer border border-blue-500 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
                                                         size="sm"
                                                         onClick={() => {
                                                             setSelectedDeduction(
@@ -296,13 +280,11 @@ export default function Index() {
                                                                 `/deductions/${deduction.id}`,
                                                                 {
                                                                     preserveScroll: true,
-
                                                                     onSuccess:
                                                                         () =>
                                                                             toast.success(
-                                                                                'Deduction deleted successfully',
+                                                                                'Deduction deleted successfully.',
                                                                             ),
-
                                                                     onError: (
                                                                         errors,
                                                                     ) => {
@@ -324,6 +306,19 @@ export default function Index() {
                                                         }}
                                                     >
                                                         Delete
+                                                    </Button>
+                                                    <Button
+                                                        className="cursor-pointer border border-amber-500 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            addToBalance(
+                                                                deduction.employee_id,
+                                                                deduction.amount,
+                                                                deduction.id,
+                                                            );
+                                                        }}
+                                                    >
+                                                        Add to Balance
                                                     </Button>
                                                 </div>
                                             )}

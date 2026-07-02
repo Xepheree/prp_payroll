@@ -14,6 +14,24 @@ import {
 } from '@/components/ui/table';
 import { formatDate } from '@/lib/utils';
 
+import { router } from '@inertiajs/react';
+import { useState } from 'react';
+import { toast } from 'sonner';
+
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+
 interface PayrollItem {
     id: number;
 
@@ -51,14 +69,42 @@ interface Payroll {
 }
 
 export default function Show() {
-    const { payroll } = usePage().props as {
+    const { payroll, items } = usePage().props as {
         payroll: Payroll;
+        items: PayrollItem[];
     };
 
-    const totalPayroll = payroll.items.reduce(
+    const totalPayroll = items.reduce(
         (total, item) => total + Number(item.net_pay),
         0,
     );
+
+    const [openFinalize, setOpenFinalize] = useState(false);
+    const [confirmed, setConfirmed] = useState(false);
+
+    const finalizePayroll = () => {
+        router.post(
+            `/payroll/${payroll.id}/finalize`,
+            {},
+            {
+                preserveScroll: true,
+
+                onSuccess: () => {
+                    toast.success('Payroll finalized successfully.');
+                    setOpenFinalize(false);
+                    setConfirmed(false);
+                },
+
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+
+                    if (firstError) {
+                        toast.error(firstError as string);
+                    }
+                },
+            },
+        );
+    };
 
     return (
         <>
@@ -75,7 +121,11 @@ export default function Show() {
                         </p>
                     </div>
 
-                    <Button>Finalize Payroll</Button>
+                    {payroll.status === 'draft' && (
+                        <Button onClick={() => setOpenFinalize(true)}>
+                            Finalize Payroll
+                        </Button>
+                    )}
                 </div>
 
                 <Card>
@@ -92,7 +142,7 @@ export default function Show() {
                                     </div>
 
                                     <div className="text-2xl font-bold">
-                                        {payroll.items.length}
+                                        {items.length}
                                     </div>
                                 </CardContent>
                             </Card>
@@ -156,7 +206,7 @@ export default function Show() {
                             </TableHeader>
 
                             <TableBody>
-                                {payroll.items.map((item) => (
+                                {items.map((item) => (
                                     <TableRow key={item.id}>
                                         <TableCell>
                                             {item.employee.name}
@@ -209,6 +259,57 @@ export default function Show() {
                     </CardContent>
                 </Card>
             </div>
+
+            <AlertDialog
+                open={openFinalize}
+                onOpenChange={(open) => {
+                    setOpenFinalize(open);
+
+                    if (!open) {
+                        setConfirmed(false);
+                    }
+                }}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Finalize Payroll?</AlertDialogTitle>
+
+                        <AlertDialogDescription>
+                            Finalizing this payroll will create permanent
+                            payroll records, assign all included trips and
+                            deductions to this payroll, and prevent future
+                            changes from affecting these payroll amounts. This
+                            action cannot be undone.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className="flex items-center space-x-2 rounded-md border p-3">
+                        <Checkbox
+                            id="confirm-finalize"
+                            checked={confirmed}
+                            onCheckedChange={(checked) =>
+                                setConfirmed(Boolean(checked))
+                            }
+                        />
+
+                        <Label htmlFor="confirm-finalize">
+                            I have reviewed this payroll and understand that
+                            finalizing will lock its values.
+                        </Label>
+                    </div>
+
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+
+                        <AlertDialogAction
+                            disabled={!confirmed}
+                            onClick={finalizePayroll}
+                        >
+                            Finalize Payroll
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </>
     );
 }
