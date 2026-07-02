@@ -13,24 +13,52 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceController extends Controller
 {
-    public function index()
-    {
-        return Inertia::render('attendance/index', [
-            'breadcrumbs' => [
-                ['title' => 'Attendance', 'href' => '/attendance'],
-            ],
-            'employees' => Employee::where(
-                'status',
-                'active'
-            )->get(),
 
-            'attendances' => Attendance::withCount([
+public function index(Request $request)
+{
+    $attendances = Attendance::query();
+
+    if ($request->filled('start_date')) {
+        $attendances->whereDate(
+            'period_start',
+            '>=',
+            $request->start_date
+        );
+    }
+
+    if ($request->filled('end_date')) {
+        $attendances->whereDate(
+            'period_end',
+            '<=',
+            $request->end_date
+        );
+    }
+
+    return Inertia::render('attendance/index', [
+        'breadcrumbs' => [
+            ['title' => 'Attendance', 'href' => '/attendance'],
+        ],
+
+        'employees' => Employee::where(
+            'status',
+            'active'
+        )->get(),
+
+        'attendances' => $attendances
+            ->withCount([
                 'items as employees_count' => function ($query) {
                     $query->select(DB::raw('count(distinct employee_id)'));
                 }
-            ])->latest()->get(),
-        ]);
-    }
+            ])
+            ->latest()
+            ->get(),
+
+        'filters' => [
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ],
+    ]);
+}
 
     public function store(Request $request)
     {

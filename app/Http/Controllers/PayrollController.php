@@ -11,30 +11,45 @@ use Inertia\Inertia;
 
 class PayrollController extends Controller
 {
-    public function index()
-    {
-        return Inertia::render('payroll/index', [
-            'breadcrumbs' => [
-                [
-                    'title' => 'Payroll',
-                    'href' => '/payroll',
-                ],
-            ],
+    public function index(Request $request)
+{
+    $payrolls = Payroll::query();
 
-            'payrolls' => Payroll::latest()->get(),
-
-            'availableAttendances' => Attendance::doesntHave('payroll')
-                ->withCount([
-                    'items as employees_count' => function ($query) {
-                        $query->selectRaw(
-                            'count(distinct employee_id)'
-                        );
-                    },
-                ])
-                ->latest()
-                ->get(),
-        ]);
+    if ($request->filled('start_date')) {
+        $payrolls->whereDate('start_date', '>=', $request->start_date);
     }
+
+    if ($request->filled('end_date')) {
+        $payrolls->whereDate('end_date', '<=', $request->end_date);
+    }
+
+    return Inertia::render('payroll/index', [
+        'breadcrumbs' => [
+            [
+                'title' => 'Payroll',
+                'href' => '/payroll',
+            ],
+        ],
+
+        'payrolls' => $payrolls
+            ->latest('start_date')
+            ->get(),
+
+        'availableAttendances' => Attendance::doesntHave('payroll')
+            ->withCount([
+                'items as employees_count' => function ($query) {
+                    $query->selectRaw('count(distinct employee_id)');
+                },
+            ])
+            ->latest()
+            ->get(),
+
+        'filters' => [
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ],
+    ]);
+}
 
     public function store(Request $request)
     {

@@ -14,15 +14,20 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { formatDate } from '@/lib/utils';
+import EmptyState from '@/components/custom/EmptyState';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 export default function Index() {
     const [openCreate, setOpenCreate] = useState(false);
-    const { payrolls, availableAttendances } = usePage().props;
+    const { payrolls, availableAttendances, filters } = usePage()
+        .props as PageProps;
 
-    /* Edge Cases:
-     1. Misinput in the attendance when published
+    const [dateFilters, setDateFilters] = useState({
+        start_date: filters?.start_date ?? '',
+        end_date: filters?.end_date ?? '',
+    });
 
-    */
     return (
         <>
             <Head title="Payroll" />
@@ -55,57 +60,131 @@ export default function Index() {
                 <Card>
                     <CardHeader>
                         <CardTitle>Payroll Records</CardTitle>
+
+                        <div className="flex items-end gap-4">
+                            <div>
+                                <Label>From</Label>
+                                <Input
+                                    type="date"
+                                    value={dateFilters.start_date}
+                                    onChange={(e) =>
+                                        setDateFilters({
+                                            ...dateFilters,
+                                            start_date: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <div>
+                                <Label>To</Label>
+                                <Input
+                                    type="date"
+                                    value={dateFilters.end_date}
+                                    onChange={(e) =>
+                                        setDateFilters({
+                                            ...dateFilters,
+                                            end_date: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <Button
+                                onClick={() =>
+                                    router.get(
+                                        '/payroll',
+                                        {
+                                            start_date: dateFilters.start_date,
+                                            end_date: dateFilters.end_date,
+                                        },
+                                        {
+                                            preserveState: true,
+                                            replace: true,
+                                        },
+                                    )
+                                }
+                            >
+                                Filter
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setDateFilters({
+                                        start_date: '',
+                                        end_date: '',
+                                    });
+
+                                    router.get('/payroll');
+                                }}
+                            >
+                                Clear
+                            </Button>
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Payroll Period</TableHead>
-                                        <TableHead>Employees</TableHead>
-                                        <TableHead>Total Payroll</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-
-                                <TableBody>
-                                    {payrolls.map((payroll, index) => (
-                                        <TableRow
-                                            key={payroll.id}
-                                            onClick={() =>
-                                                router.visit(
-                                                    `/payroll/${payroll.id}`,
-                                                )
-                                            }
-                                            className={`cursor-pointer border-r font-medium ${
-                                                index === 0
-                                                    ? 'border-l-4 border-l-green-500 bg-green-500/10 hover:bg-green-500/20'
-                                                    : ''
-                                            }`}
-                                        >
-                                            <TableCell>
-                                                {formatDate(payroll.start_date)}{' '}
-                                                - {formatDate(payroll.end_date)}
-                                            </TableCell>
-
-                                            <TableCell className="border-r">
-                                                -
-                                            </TableCell>
-
-                                            <TableCell className="border-r">
-                                                ₱0.00
-                                            </TableCell>
-
-                                            <TableCell className="border-r">
-                                                {getPayrollStatusBadge(
-                                                    payroll.status,
-                                                )}
-                                            </TableCell>
+                        {payrolls.length === 0 ? (
+                            <EmptyState
+                                title="No Payroll Records Found"
+                                description="Create your first payroll period."
+                                actionLabel="New Payroll"
+                                onAction={() => setOpenCreate(true)}
+                            />
+                        ) : (
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>
+                                                Payroll Period
+                                            </TableHead>
+                                            <TableHead>Employees</TableHead>
+                                            <TableHead>Total Payroll</TableHead>
+                                            <TableHead>Status</TableHead>
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                    </TableHeader>
+
+                                    <TableBody>
+                                        {payrolls.map((payroll, index) => (
+                                            <TableRow
+                                                key={payroll.id}
+                                                onClick={() =>
+                                                    router.visit(
+                                                        `/payroll/${payroll.id}`,
+                                                    )
+                                                }
+                                                className={`cursor-pointer border-r font-medium ${
+                                                    index === 0
+                                                        ? 'border-l-4 border-l-green-500 bg-green-500/10 hover:bg-green-500/20'
+                                                        : ''
+                                                }`}
+                                            >
+                                                <TableCell>
+                                                    {formatDate(
+                                                        payroll.start_date,
+                                                    )}{' '}
+                                                    -{' '}
+                                                    {formatDate(
+                                                        payroll.end_date,
+                                                    )}
+                                                </TableCell>
+
+                                                <TableCell>-</TableCell>
+
+                                                <TableCell>₱0.00</TableCell>
+
+                                                <TableCell>
+                                                    {getPayrollStatusBadge(
+                                                        payroll.status,
+                                                    )}
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

@@ -103,10 +103,6 @@ export default function Index() {
                                             <TableHead className="w-45 border-r">
                                                 Last Updated
                                             </TableHead>
-
-                                            <TableHead className="w-45">
-                                                Actions
-                                            </TableHead>
                                         </TableRow>
                                     </TableHeader>
 
@@ -147,60 +143,6 @@ export default function Index() {
                                                     {new Date(
                                                         employee.updated_at,
                                                     ).toLocaleDateString()}
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    <div className="flex gap-2">
-                                                        {editingId ===
-                                                        employee.id ? (
-                                                            <>
-                                                                <Button
-                                                                    size="sm"
-                                                                    onClick={() =>
-                                                                        saveBalance(
-                                                                            employee.id,
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    Save
-                                                                </Button>
-
-                                                                <Button
-                                                                    size="sm"
-                                                                    variant="outline"
-                                                                    onClick={() => {
-                                                                        setEditingId(
-                                                                            null,
-                                                                        );
-                                                                        setEditedBalance(
-                                                                            '',
-                                                                        );
-                                                                    }}
-                                                                >
-                                                                    Cancel
-                                                                </Button>
-                                                            </>
-                                                        ) : (
-                                                            <Button
-                                                                variant="outline"
-                                                                size="sm"
-                                                                onClick={() => {
-                                                                    setEditingId(
-                                                                        employee.id,
-                                                                    );
-
-                                                                    setEditedBalance(
-                                                                        String(
-                                                                            employee.balance ??
-                                                                                0,
-                                                                        ),
-                                                                    );
-                                                                }}
-                                                            >
-                                                                Update
-                                                            </Button>
-                                                        )}
-                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         ))}
