@@ -155,9 +155,7 @@ function CreateEmployeeModal({
             <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-xl">
                 <DialogHeader>
                     <DialogTitle>
-                        <DialogTitle>
-                            {isEditing ? 'Edit Employee' : 'Add Employee'}
-                        </DialogTitle>
+                        {isEditing ? 'Edit Employee' : 'Add Employee'}
                     </DialogTitle>
                 </DialogHeader>
 

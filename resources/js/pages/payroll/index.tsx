@@ -33,7 +33,6 @@ export default function Index() {
                         <h1 className="text-3xl font-bold">Payroll</h1>
                         <p className="text-muted-foreground">
                             Manage payroll periods and employee compensation
-                            (DUMMY DATA)
                         </p>
                     </div>
 

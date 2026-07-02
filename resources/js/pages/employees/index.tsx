@@ -1,8 +1,8 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
-import { Plus, Pencil } from 'lucide-react';
+import { Head, usePage } from '@inertiajs/react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { toast } from 'sonner';
-import DeleteConfirmationDialog from '@/components/custom/modals/DeleteConfirmationDialog';
+import EmployeeRow from '@/components/custom/EmployeeRow';
+import EmptyState from '@/components/custom/EmptyState';
 import CreateEmployeeModal from '@/components/custom/modals/employees/CreateEmployeeModal';
 import ViewEmployeeModal from '@/components/custom/modals/employees/ViewEmployeeModal';
 import { Badge } from '@/components/ui/badge';
@@ -11,66 +11,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import {
     Table,
     TableBody,
-    TableCell,
     TableHead,
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import EmptyState from '@/components/custom/EmptyState';
 
 export default function Index() {
-    // dummy data
-    // const employees = [
-    //     {
-    //         id: 1,
-    //         image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e',
-    //         name: 'Juan Dela Cruz',
-    //         designation: 'Driver',
-    //         rate: 850,
-    //         ot_rate: 120,
-    //         status: 'active',
-    //     },
-    //     {
-    //         id: 2,
-    //         image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330',
-    //         name: 'Maria Santos',
-    //         designation: 'Dispatcher',
-    //         rate: 950,
-    //         ot_rate: 140,
-    //         status: 'active',
-    //     },
-    //     {
-    //         id: 3,
-    //         image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d',
-    //         name: 'Pedro Reyes',
-    //         designation: 'Helper',
-    //         rate: 650,
-    //         ot_rate: 100,
-    //         status: 'inactive',
-    //     },
-    // ];
-
-    const { employees, flash } = usePage().props as PageProps;
+    const { employees } = usePage().props as any;
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [open, setOpen] = useState(false);
 
     const handleRowClick = (employee) => {
         setSelectedEmployee(employee);
         setOpen(true);
-    };
-
-    const { processing, delete: destroy } = useForm();
-
-    const handleDelete = (id: number, name: string) => {
-        destroy(`/employees/${id}`, {
-            onSuccess: () => {
-                toast.success(`${name} was removed successfully.`);
-            },
-
-            onError: () => {
-                toast.error(`Failed to remove ${name}.`);
-            },
-        });
     };
 
     const [openCreate, setOpenCreate] = useState(false);
@@ -125,6 +78,7 @@ export default function Index() {
                                         <TableHead>Designation</TableHead>
                                         <TableHead>Rate</TableHead>
                                         <TableHead>OT Rate</TableHead>
+                                        <TableHead>Trip Rate</TableHead>
                                         <TableHead>Status</TableHead>
                                         <TableHead className="w-[150px]">
                                             Actions
@@ -136,91 +90,16 @@ export default function Index() {
                                     {[...employees]
                                         .sort((a, b) => b.id - a.id)
                                         .map((employee, index) => (
-                                            <TableRow
+                                            <EmployeeRow
+                                                employee={employee}
+                                                index={index}
+                                                handleRowClick={handleRowClick}
+                                                setEditingEmployee={
+                                                    setEditingEmployee
+                                                }
+                                                setOpenCreate={setOpenCreate}
                                                 key={employee.id}
-                                                className="cursor-pointer"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleRowClick(employee);
-                                                }}
-                                            >
-                                                <TableCell>
-                                                    {index + 1}
-                                                </TableCell>
-                                                <TableCell className="font-medium">
-                                                    <div className="flex items-center gap-3">
-                                                        <img
-                                                            src={
-                                                                employee.image
-                                                                    ? `/storage/${employee.image}`
-                                                                    : '/images/employee_placeholder.png'
-                                                            }
-                                                            alt={employee.name}
-                                                            className="h-10 w-10 rounded-md border object-cover"
-                                                        />
-                                                        <span>
-                                                            {employee.name}
-                                                        </span>
-                                                    </div>
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    {getEmployeeDesignationBadge(
-                                                        employee.designation,
-                                                    )}
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    ₱
-                                                    {employee.rate.toLocaleString()}
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    ₱
-                                                    {employee.ot_rate.toLocaleString()}
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    {getEmployeeStatusBadge(
-                                                        employee.status,
-                                                    )}
-                                                </TableCell>
-
-                                                <TableCell>
-                                                    <div className="flex gap-2">
-                                                        <Button
-                                                            size="icon"
-                                                            variant="outline"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-
-                                                                setEditingEmployee(
-                                                                    employee,
-                                                                );
-                                                                setOpenCreate(
-                                                                    true,
-                                                                );
-                                                            }}
-                                                        >
-                                                            <Pencil className="h-4 w-4" />
-                                                        </Button>
-
-                                                        <DeleteConfirmationDialog
-                                                            title="Delete Employee?"
-                                                            description={`This will permanently remove ${employee.name}. This action cannot be undone.`}
-                                                            processing={
-                                                                processing
-                                                            }
-                                                            onConfirm={() =>
-                                                                handleDelete(
-                                                                    employee.id,
-                                                                    employee.name,
-                                                                )
-                                                            }
-                                                        />
-                                                    </div>
-                                                </TableCell>
-                                            </TableRow>
+                                            />
                                         ))}
                                 </TableBody>
                             </Table>
