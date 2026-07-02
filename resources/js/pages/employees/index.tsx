@@ -87,20 +87,18 @@ export default function Index() {
                                 </TableHeader>
 
                                 <TableBody>
-                                    {[...employees]
-                                        .sort((a, b) => b.id - a.id)
-                                        .map((employee, index) => (
-                                            <EmployeeRow
-                                                employee={employee}
-                                                index={index}
-                                                handleRowClick={handleRowClick}
-                                                setEditingEmployee={
-                                                    setEditingEmployee
-                                                }
-                                                setOpenCreate={setOpenCreate}
-                                                key={employee.id}
-                                            />
-                                        ))}
+                                    {[...employees].map((employee, index) => (
+                                        <EmployeeRow
+                                            employee={employee}
+                                            index={index}
+                                            handleRowClick={handleRowClick}
+                                            setEditingEmployee={
+                                                setEditingEmployee
+                                            }
+                                            setOpenCreate={setOpenCreate}
+                                            key={employee.id}
+                                        />
+                                    ))}
                                 </TableBody>
                             </Table>
                         )}

@@ -14,7 +14,7 @@ class OBController extends Controller
             'breadcrumbs' => [
                 ['title' => 'Outstanding Balances', 'href' => '/obs'],
             ],
-            'employees' => Employee::latest()
+            'employees' => Employee::orderBy('id', 'asc')
                 ->withSum('transactions', 'amount')
                 ->get(),
         ]);

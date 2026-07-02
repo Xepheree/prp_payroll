@@ -44,4 +44,9 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeTransaction::class);
     }
+
+    public function attendanceItems()
+    {
+        return $this->hasMany(AttendanceItem::class);
+    }
 }

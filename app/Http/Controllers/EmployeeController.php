@@ -15,13 +15,33 @@ class EmployeeController extends Controller
             'breadcrumbs' => [
                 ['title' => 'Employees', 'href' => '/employees'],
             ],
-            'employees' => Employee::all(),
+            'employees' => Employee::orderBy('id', 'asc')->get(),
         ]);
     }
 
     public function create()
     {
         return Inertia::render('employees/create', []);
+    }
+
+    public function show(Employee $employee)
+    {
+        $employee->load([
+            // 'drivenTrips.truck',
+            // 'assistedTrips.truck',
+            'payrollItems.payroll',
+            'deductions',
+            'transactions',
+        ]);
+
+        return Inertia::render('employees/show', [
+            'breadcrumbs' => [
+                ['title' => 'Employees', 'href' => '/employees'],
+                ['title' => $employee->name],
+            ],
+
+            'employee' => $employee,
+        ]);
     }
 
     public function store(Request $request)

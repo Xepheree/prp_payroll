@@ -8,7 +8,7 @@ import { Button } from '../ui/button';
 import { ClipboardList, Pencil } from 'lucide-react';
 import DeleteConfirmationDialog from './modals/DeleteConfirmationDialog';
 import { toast } from 'sonner';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 
 function EmployeeRow({
     employee,
@@ -79,7 +79,14 @@ function EmployeeRow({
             {/* Employee Actions */}
             <TableCell>
                 <div className="flex gap-2">
-                    <Button size="icon" variant="outline">
+                    <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            router.visit(`/employees/${employee.id}`);
+                        }}
+                    >
                         <ClipboardList className="h-4 w-4" />
                     </Button>
                     <Button
