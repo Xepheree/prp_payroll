@@ -7,6 +7,8 @@ use App\Models\Deduction;
 use App\Models\Payroll;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use App\Models\EmployeeTransaction;
+
 
 class DeductionController extends Controller
 {
@@ -176,6 +178,7 @@ class DeductionController extends Controller
         );
     }
 
+
     public function addToBalance(Deduction $deduction)
     {
         if ($deduction->added_to_balance) {
@@ -184,9 +187,20 @@ class DeductionController extends Controller
             ]);
         }
 
-        $employee = $deduction->employee;
+        EmployeeTransaction::create([
+            'employee_id' => $deduction->employee_id,
 
-        $employee->increment('balance', $deduction->amount);
+            'type' => 'deduction',
+
+            'amount' => $deduction->amount,
+
+            'description' => sprintf(
+                'Late filing deduction (%s)',
+                str_replace('_', ' ', $deduction->type)
+            ),
+
+            'deduction_id' => $deduction->id,
+        ]);
 
         $deduction->update([
             'added_to_balance' => true,
@@ -195,7 +209,7 @@ class DeductionController extends Controller
 
         return back()->with(
             'success',
-            'Deduction added to employee balance successfully.'
+            'Deduction added to employee transaction history.'
         );
     }
 }

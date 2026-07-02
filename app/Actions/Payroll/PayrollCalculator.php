@@ -4,6 +4,7 @@ namespace App\Actions\Payroll;
 
 use App\Models\Attendance;
 use App\Models\Deduction;
+use App\Models\EmployeeTransaction;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Models\Trip;
@@ -174,6 +175,22 @@ class PayrollCalculator
 
         'gross_pay' => $item['gross_pay'],
         'net_pay' => $item['net_pay'],
+      ]);
+
+      EmployeeTransaction::create([
+        'employee_id' => $item['employee']->id,
+
+        'type' => 'payroll',
+
+        'amount' => -$item['net_pay'],
+
+        'description' => sprintf(
+          'Payroll %s - %s',
+          $payroll->start_date,
+          $payroll->end_date
+        ),
+
+        'payroll_id' => $payroll->id,
       ]);
 
       if ($item['delivery_ids']->isNotEmpty()) {

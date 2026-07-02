@@ -15,6 +15,7 @@ class OBController extends Controller
                 ['title' => 'Outstanding Balances', 'href' => '/obs'],
             ],
             'employees' => Employee::latest()
+                ->withSum('transactions', 'amount')
                 ->get(),
         ]);
     }

@@ -74,48 +74,74 @@ export default function Index() {
         {} as Record<string, Deduction[]>,
     );
 
-    const addToBalance = (
-        employee_id: number,
-        amount: number,
-        deductionid: number,
-    ) => {
-        const employee = employees.find(
-            (employee) => employee.id === employee_id,
-        );
+    // const addToBalance = (
+    //     employee_id: number,
+    //     amount: number,
+    //     deductionid: number,
+    // ) => {
+    //     const employee = employees.find(
+    //         (employee) => employee.id === employee_id,
+    //     );
 
-        if (!employee) {
-            toast.error('Employee not found.');
+    //     if (!employee) {
+    //         toast.error('Employee not found.');
 
-            return;
-        }
+    //         return;
+    //     }
 
-        router.patch(
-            `/obs/${employee_id}`,
-            {
-                balance: Number(employee.balance ?? 0) + Number(amount),
-            },
+    //     router.patch(
+    //         `/obs/${employee_id}`,
+    //         {
+    //             balance: Number(employee.balance ?? 0) + Number(amount),
+    //         },
+    //         {
+    //             preserveScroll: true,
+
+    //             onSuccess: () => {
+    //                 router.delete(`/deductions/${deductionid}`, {
+    //                     preserveScroll: true,
+
+    //                     onSuccess: () =>
+    //                         toast.success(
+    //                             'Deduction moved to employee balance.',
+    //                         ),
+
+    //                     onError: (errors) => {
+    //                         const firstError = Object.values(errors)[0];
+
+    //                         toast.error(
+    //                             firstError
+    //                                 ? (firstError as string)
+    //                                 : 'Failed to remove deduction.',
+    //                         );
+    //                     },
+    //                 });
+    //             },
+
+    //             onError: (errors) => {
+    //                 const firstError = Object.values(errors)[0];
+
+    //                 toast.error(
+    //                     firstError
+    //                         ? (firstError as string)
+    //                         : 'Failed to update balance.',
+    //                 );
+    //             },
+    //         },
+    //     );
+    // };
+
+    const addToBalance = (deductionId: number) => {
+        router.post(
+            `/deductions/${deductionId}/balance`,
+            {},
             {
                 preserveScroll: true,
 
                 onSuccess: () => {
-                    router.delete(`/deductions/${deductionid}`, {
-                        preserveScroll: true,
-
-                        onSuccess: () =>
-                            toast.success(
-                                'Deduction moved to employee balance.',
-                            ),
-
-                        onError: (errors) => {
-                            const firstError = Object.values(errors)[0];
-
-                            toast.error(
-                                firstError
-                                    ? (firstError as string)
-                                    : 'Failed to remove deduction.',
-                            );
-                        },
-                    });
+                    toast.success(
+                        'Deduction transferred to employee transaction history.',
+                    );
                 },
 
                 onError: (errors) => {
@@ -124,7 +150,7 @@ export default function Index() {
                     toast.error(
                         firstError
                             ? (firstError as string)
-                            : 'Failed to update balance.',
+                            : 'Failed to transfer deduction.',
                     );
                 },
             },
@@ -234,9 +260,13 @@ export default function Index() {
                                                 <div
                                                     className="rounded-md border border-amber-500 bg-amber-500/20 px-3 py-1 text-center"
                                                     onClick={() => {
+                                                        // addToBalance(
+                                                        //     deduction.employee_id,
+                                                        //     deduction.amount,
+                                                        //     deduction.id,
+                                                        // );
+
                                                         addToBalance(
-                                                            deduction.employee_id,
-                                                            deduction.amount,
                                                             deduction.id,
                                                         );
                                                     }}
@@ -312,8 +342,6 @@ export default function Index() {
                                                         size="sm"
                                                         onClick={() => {
                                                             addToBalance(
-                                                                deduction.employee_id,
-                                                                deduction.amount,
                                                                 deduction.id,
                                                             );
                                                         }}

@@ -136,7 +136,7 @@ export default function Index() {
                                                         <div className="align-center flex gap-2">
                                                             <span>₱</span>
                                                             {Number(
-                                                                employee.balance ??
+                                                                employee.transactions_sum_amount ??
                                                                     0,
                                                             ).toLocaleString()}
                                                         </div>

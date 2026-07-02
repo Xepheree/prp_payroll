@@ -39,4 +39,9 @@ class Employee extends Model
     {
         return $this->hasMany(Deduction::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(EmployeeTransaction::class);
+    }
 }
