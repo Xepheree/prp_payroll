@@ -21,7 +21,7 @@ Route::inertia('/', 'welcome')->name('home');
 // anyone authenticated
 Route::middleware(['auth'])->group(function () {
     // Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    // Employees
+    // -- Employees
     Route::get(
         '/dashboard',
         [DashboardController::class, 'index']
@@ -31,13 +31,13 @@ Route::middleware(['auth'])->group(function () {
 // admin access only
 Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
-    // Employees
+    // -- Employees -- //
     Route::resource('employees', EmployeeController::class);
 
-    // Trips
+    // -- Trips -- //
     Route::resource('trips', TripController::class);
 
-    // Outstanding
+    // -- Outstanding -- //
     // Route::resource('obs', OBController::class);
     Route::get('/obs', [OBController::class, 'index'])
         ->name('obs.index');
@@ -46,39 +46,44 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
         [OBController::class, 'update']
     )->name('obs.update');
 
-    // Deductions
+    // -- Deductions -- //
     Route::resource('deductions', DeductionController::class);
     Route::post(
         '/deductions/{deduction}/balance',
         [DeductionController::class, 'addToBalance']
     )->name('deductions.balance');
 
-    // Payroll
+    // -- Payroll -- //
     Route::resource('payroll', PayrollController::class);
     Route::post(
         '/payroll/{payroll}/finalize',
         [PayrollController::class, 'finalize']
     )->name('payroll.finalize');
+    // Generate Payslip
+    Route::get(
+        '/payroll/{payroll}/employees/{employee}/payslip',
+        [PayrollController::class, 'payslip']
+    )->name('payroll.payslip');
 
-    // Billings
+    // -- Billings -- //
     Route::resource('billings', BillingsController::class);
 
-    // Trucks
+    // -- Trucks -- //
     Route::resource('trucks', TrucksController::class);
 
-    // Companies
+    // -- Companies -- //
     Route::resource('companies', CompaniesController::class);
 
-    // Inventory
+    // -- Inventory -- //
     Route::resource('inventory', InventoryController::class);
 
-    // Cash Flow
+    // -- Cash Flow -- //
     Route::resource('cash-flow', CashFlowController::class);
 
-    // Budget
+    // -- Budget -- //
     Route::resource('budget', BudgetController::class);
 
-    // Attendance
+    // -- Attendance -- //
     Route::resource('attendance', AttendanceController::class);
     Route::patch(
         '/attendance/{attendance}/publish',

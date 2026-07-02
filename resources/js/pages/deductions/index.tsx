@@ -229,18 +229,16 @@ export default function Index() {
                                         </TableCell>
 
                                         <TableCell>
-                                            {deduction.payroll ? (
+                                            {deduction.payroll_id !== null ? (
                                                 <div
-                                                    className="rounded-md border border-green-500 bg-green-500/20 px-3 py-1 text-center"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-
+                                                    className="cursor-pointer rounded-md border border-green-500 bg-green-500/10 px-3 py-1 text-center hover:bg-green-500/20"
+                                                    onClick={() =>
                                                         router.visit(
-                                                            `/payroll/${deduction.payroll!.id}`,
-                                                        );
-                                                    }}
+                                                            `/payroll/${deduction.payroll.id}`,
+                                                        )
+                                                    }
                                                 >
-                                                    <p className="text-sm font-semibold text-green-600">
+                                                    <p className="text-sm font-medium text-green-600">
                                                         Included in Payroll
                                                     </p>
 
@@ -256,33 +254,32 @@ export default function Index() {
                                                         )}
                                                     </p>
                                                 </div>
+                                            ) : deduction.added_to_balance ? (
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    disabled
+                                                >
+                                                    Added to Balance
+                                                </Button>
                                             ) : deduction.can_add_to_balance ? (
-                                                <div
-                                                    className="rounded-md border border-amber-500 bg-amber-500/20 px-3 py-1 text-center"
-                                                    onClick={() => {
-                                                        // addToBalance(
-                                                        //     deduction.employee_id,
-                                                        //     deduction.amount,
-                                                        //     deduction.id,
-                                                        // );
-
+                                                // Late Filing
+                                                <Button
+                                                    variant="secondary"
+                                                    size="sm"
+                                                    onClick={() =>
                                                         addToBalance(
                                                             deduction.id,
-                                                        );
-                                                    }}
+                                                        )
+                                                    }
                                                 >
-                                                    <p className="text-sm font-medium text-amber-500">
-                                                        Add to balance
-                                                    </p>
-
-                                                    <p className="text-xs text-muted-foreground">
-                                                        Late Filing
-                                                    </p>
-                                                </div>
+                                                    Add to Balance
+                                                </Button>
                                             ) : (
-                                                <div className="flex gap-2">
+                                                // Early Filing
+                                                <>
                                                     <Button
-                                                        className="cursor-pointer border border-blue-500 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20"
+                                                        variant="outline"
                                                         size="sm"
                                                         onClick={() => {
                                                             setSelectedDeduction(
@@ -298,57 +295,24 @@ export default function Index() {
                                                         variant="destructive"
                                                         size="sm"
                                                         onClick={() => {
-                                                            if (
-                                                                !confirm(
-                                                                    'Delete this deduction?',
-                                                                )
-                                                            ) {
-                                                                return;
-                                                            }
-
-                                                            router.delete(
-                                                                `/deductions/${deduction.id}`,
-                                                                {
-                                                                    preserveScroll: true,
-                                                                    onSuccess:
-                                                                        () =>
-                                                                            toast.success(
-                                                                                'Deduction deleted successfully.',
-                                                                            ),
-                                                                    onError: (
-                                                                        errors,
-                                                                    ) => {
-                                                                        const firstError =
-                                                                            Object.values(
-                                                                                errors,
-                                                                            )[0];
-
-                                                                        if (
-                                                                            firstError
-                                                                        ) {
-                                                                            toast.error(
-                                                                                firstError as string,
-                                                                            );
-                                                                        }
-                                                                    },
-                                                                },
-                                                            );
+                                                            // delete...
                                                         }}
                                                     >
                                                         Delete
                                                     </Button>
+
                                                     <Button
-                                                        className="cursor-pointer border border-amber-500 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                                                        variant="secondary"
                                                         size="sm"
-                                                        onClick={() => {
+                                                        onClick={() =>
                                                             addToBalance(
                                                                 deduction.id,
-                                                            );
-                                                        }}
+                                                            )
+                                                        }
                                                     >
                                                         Add to Balance
                                                     </Button>
-                                                </div>
+                                                </>
                                             )}
                                         </TableCell>
                                     </TableRow>

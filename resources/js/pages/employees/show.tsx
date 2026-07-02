@@ -163,10 +163,20 @@ export default function Show() {
                                                 {transaction.description}
                                             </TableCell>
 
-                                            <TableCell>
+                                            <TableCell
+                                                className={
+                                                    Number(transaction.amount) <
+                                                    0
+                                                        ? 'font-medium text-green-400'
+                                                        : 'font-medium text-red-400'
+                                                }
+                                            >
+                                                {Number(transaction.amount) > 0
+                                                    ? '- '
+                                                    : '+ '}
                                                 ₱
-                                                {Number(
-                                                    transaction.amount,
+                                                {Math.abs(
+                                                    Number(transaction.amount),
                                                 ).toLocaleString()}
                                             </TableCell>
                                         </TableRow>

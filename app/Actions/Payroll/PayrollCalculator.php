@@ -8,6 +8,7 @@ use App\Models\EmployeeTransaction;
 use App\Models\Payroll;
 use App\Models\PayrollItem;
 use App\Models\Trip;
+use Carbon\Carbon;
 
 class PayrollCalculator
 {
@@ -84,6 +85,10 @@ class PayrollCalculator
             fn($q) => $q->whereNull('payroll_id')
           )
           ->where('employee_id', $employee->id)
+          ->where(function ($query) {
+            $query->whereNull('added_to_balance')
+              ->orWhere('added_to_balance', false);
+          })
           ->whereBetween('date', [
             $attendance->period_start,
             $attendance->period_end,
@@ -186,8 +191,8 @@ class PayrollCalculator
 
         'description' => sprintf(
           'Payroll %s - %s',
-          $payroll->start_date,
-          $payroll->end_date
+          Carbon::parse($payroll->start_date)->format('M d, Y'),
+          Carbon::parse($payroll->end_date)->format('M d, Y'),
         ),
 
         'payroll_id' => $payroll->id,

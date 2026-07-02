@@ -42,7 +42,8 @@ class Employee extends Model
 
     public function transactions()
     {
-        return $this->hasMany(EmployeeTransaction::class);
+        return $this->hasMany(EmployeeTransaction::class)
+            ->latest();
     }
 
     public function attendanceItems()

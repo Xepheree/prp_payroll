@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Payroll;
 use App\Actions\Payroll\PayrollCalculator;
+use App\Models\Employee;
+use App\Models\PayrollItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -12,44 +14,44 @@ use Inertia\Inertia;
 class PayrollController extends Controller
 {
     public function index(Request $request)
-{
-    $payrolls = Payroll::query();
+    {
+        $payrolls = Payroll::query();
 
-    if ($request->filled('start_date')) {
-        $payrolls->whereDate('start_date', '>=', $request->start_date);
-    }
+        if ($request->filled('start_date')) {
+            $payrolls->whereDate('start_date', '>=', $request->start_date);
+        }
 
-    if ($request->filled('end_date')) {
-        $payrolls->whereDate('end_date', '<=', $request->end_date);
-    }
+        if ($request->filled('end_date')) {
+            $payrolls->whereDate('end_date', '<=', $request->end_date);
+        }
 
-    return Inertia::render('payroll/index', [
-        'breadcrumbs' => [
-            [
-                'title' => 'Payroll',
-                'href' => '/payroll',
+        return Inertia::render('payroll/index', [
+            'breadcrumbs' => [
+                [
+                    'title' => 'Payroll',
+                    'href' => '/payroll',
+                ],
             ],
-        ],
 
-        'payrolls' => $payrolls
-            ->latest('start_date')
-            ->get(),
+            'payrolls' => $payrolls
+                ->latest('start_date')
+                ->get(),
 
-        'availableAttendances' => Attendance::doesntHave('payroll')
-            ->withCount([
-                'items as employees_count' => function ($query) {
-                    $query->selectRaw('count(distinct employee_id)');
-                },
-            ])
-            ->latest()
-            ->get(),
+            'availableAttendances' => Attendance::doesntHave('payroll')
+                ->withCount([
+                    'items as employees_count' => function ($query) {
+                        $query->selectRaw('count(distinct employee_id)');
+                    },
+                ])
+                ->latest()
+                ->get(),
 
-        'filters' => [
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-        ],
-    ]);
-}
+            'filters' => [
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+            ],
+        ]);
+    }
 
     public function store(Request $request)
     {
@@ -133,5 +135,20 @@ class PayrollController extends Controller
             'success',
             'Payroll finalized successfully.'
         );
+    }
+
+    public function payslip(Payroll $payroll, Employee $employee)
+    {
+        $item = PayrollItem::with([
+            'employee',
+            'payroll',
+        ])
+            ->where('payroll_id', $payroll->id)
+            ->where('employee_id', $employee->id)
+            ->firstOrFail();
+
+        return view('pdf.payslip', [
+            'item' => $item,
+        ]);
     }
 }

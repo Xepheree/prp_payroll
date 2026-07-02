@@ -18,7 +18,7 @@ class DeductionController extends Controller
             'employee',
             'payroll',
         ])
-            ->latest('date')
+            ->latest('created_at')
             ->get()
             ->map(function ($deduction) {
 
@@ -187,6 +187,15 @@ class DeductionController extends Controller
             ]);
         }
 
+        $coveredByPayroll = Payroll::where('status', 'finalized')
+            ->whereDate('start_date', '<=', $deduction->date)
+            ->whereDate('end_date', '>=', $deduction->date)
+            ->exists();
+
+        $filingStatus = $coveredByPayroll
+            ? 'Late Filing'
+            : 'Early Filing';
+
         EmployeeTransaction::create([
             'employee_id' => $deduction->employee_id,
 
@@ -195,7 +204,8 @@ class DeductionController extends Controller
             'amount' => $deduction->amount,
 
             'description' => sprintf(
-                'Late filing deduction (%s)',
+                '%s - %s',
+                $filingStatus,
                 str_replace('_', ' ', $deduction->type)
             ),
 

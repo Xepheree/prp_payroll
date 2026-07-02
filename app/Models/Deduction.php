@@ -12,6 +12,8 @@ class Deduction extends Model
         'type',
         'date',
         'remarks',
+        'added_to_balance',
+        'added_to_balance_at'
     ];
 
     protected $casts = [
