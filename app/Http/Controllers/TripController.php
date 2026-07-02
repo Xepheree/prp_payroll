@@ -49,7 +49,8 @@ class TripController extends Controller
 
                     $trip->is_late_filing =
                         $trip->payroll_id === null &&
-                        Payroll::whereDate('start_date', '<=', $trip->trip_date)
+                        Payroll::where('status', 'finalized')
+                        ->whereDate('start_date', '<=', $trip->trip_date)
                         ->whereDate('end_date', '>=', $trip->trip_date)
                         ->exists();
 

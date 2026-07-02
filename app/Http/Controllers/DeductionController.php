@@ -22,7 +22,8 @@ class DeductionController extends Controller
 
                 $deduction->can_add_to_balance =
                     $deduction->payroll_id === null &&
-                    Payroll::whereDate(
+                    Payroll::where('status', 'finalized')
+                    ->whereDate(
                         'start_date',
                         '<=',
                         $deduction->date
