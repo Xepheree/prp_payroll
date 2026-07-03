@@ -10,6 +10,7 @@ use App\Http\Controllers\DeductionController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\OBController;
+use App\Http\Controllers\PaymentVoucherController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\TrucksController;
@@ -64,6 +65,21 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
         '/payroll/{payroll}/employees/{employee}/payslip',
         [PayrollController::class, 'payslip']
     )->name('payroll.payslip');
+
+    // -- Payment Voucher -- //
+    Route::resource('payment-vouchers', PaymentVoucherController::class);
+    Route::post(
+        '/payment-vouchers/preview',
+        [PaymentVoucherController::class, 'preview']
+    )->name('payment-vouchers.preview');
+    Route::post(
+        '/payment-vouchers',
+        [PaymentVoucherController::class, 'store']
+    )->name('payment-vouchers.store');
+    Route::get(
+        '/payment-vouchers/{paymentVoucher}',
+        [PaymentVoucherController::class, 'show']
+    )->name('payment-vouchers.show');
 
     // -- Billings -- //
     Route::resource('billings', BillingsController::class);

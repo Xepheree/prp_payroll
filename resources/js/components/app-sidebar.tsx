@@ -9,6 +9,7 @@ import {
     LayoutGrid,
     PhilippinePeso,
     PiggyBank,
+    ReceiptText,
     Truck,
     User,
     Warehouse,
@@ -68,20 +69,25 @@ export function AppSidebar() {
                       icon: PhilippinePeso,
                   },
                   {
-                      title: 'Billings',
-                      href: '/billings',
-                      icon: Clipboard,
+                      title: 'Payment Vouchers',
+                      href: '/payment-vouchers',
+                      icon: ReceiptText,
                   },
-                  {
-                      title: 'Inventory',
-                      href: '/inventory',
-                      icon: Warehouse,
-                  },
-                  {
-                      title: 'Cash Flow',
-                      href: '/cash-flow',
-                      icon: Banknote,
-                  },
+                  //   {
+                  //       title: 'Billings',
+                  //       href: '/billings',
+                  //       icon: Clipboard,
+                  //   },
+                  //   {
+                  //       title: 'Inventory',
+                  //       href: '/inventory',
+                  //       icon: Warehouse,
+                  //   },
+                  //   {
+                  //       title: 'Cash Flow',
+                  //       href: '/cash-flow',
+                  //       icon: Banknote,
+                  //   },
               ]
             : []),
     ];
@@ -102,11 +108,11 @@ export function AppSidebar() {
             href: '/companies',
             icon: Building2,
         },
-        {
-            title: 'Budget',
-            href: '/budget',
-            icon: PiggyBank,
-        },
+        // {
+        //     title: 'Budget',
+        //     href: '/budget',
+        //     icon: PiggyBank,
+        // },
     ];
 
     return (

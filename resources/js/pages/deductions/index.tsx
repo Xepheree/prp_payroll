@@ -301,7 +301,7 @@ export default function Index() {
                                                         Delete
                                                     </Button>
 
-                                                    <Button
+                                                    {/* <Button
                                                         variant="secondary"
                                                         size="sm"
                                                         onClick={() =>
@@ -311,7 +311,7 @@ export default function Index() {
                                                         }
                                                     >
                                                         Add to Balance
-                                                    </Button>
+                                                    </Button> */}
                                                 </>
                                             )}
                                         </TableCell>

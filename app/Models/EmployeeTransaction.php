@@ -29,4 +29,14 @@ class EmployeeTransaction extends Model
     {
         return $this->belongsTo(Deduction::class);
     }
+
+    public function paymentVoucher()
+    {
+        return $this->belongsTo(PaymentVoucher::class);
+    }
+
+    public function voucherItem()
+    {
+        return $this->hasOne(PaymentVoucherItem::class);
+    }
 }

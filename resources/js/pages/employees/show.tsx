@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowLeft,
     BadgePesoSign,
@@ -6,7 +6,7 @@ import {
     Truck,
     Wallet,
 } from 'lucide-react';
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
     getEmployeeDesignationBadge,
     getEmployeeStatusBadge,
@@ -23,15 +23,15 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { formatDateTime } from '@/lib/utils';
+import { formatDate, formatDateTime } from '@/lib/utils';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 export default function Show() {
     const { employee } = usePage().props as {
         employee: Employee;
     };
-
-    console.log(employee.transactions);
+    console.log(employee);
 
     return (
         <>
@@ -134,67 +134,430 @@ export default function Show() {
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Employee Transactions</CardTitle>
-                    </CardHeader>
+                <Tabs defaultValue="transactions" className="w-full">
+                    <TabsList>
+                        <TabsTrigger value="transactions">
+                            Transactions
+                        </TabsTrigger>
 
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead>Description</TableHead>
-                                    <TableHead>Amount</TableHead>
-                                </TableRow>
-                            </TableHeader>
+                        <TabsTrigger value="driven">Driven Trips</TabsTrigger>
 
-                            <TableBody>
-                                {employee.transactions?.length ? (
-                                    employee.transactions.map((transaction) => (
-                                        <TableRow key={transaction.id}>
-                                            <TableCell>
-                                                {formatDateTime(
-                                                    transaction.created_at,
-                                                )}
-                                            </TableCell>
+                        <TabsTrigger value="assisted">
+                            Assisted Trips
+                        </TabsTrigger>
 
-                                            <TableCell>
-                                                {transaction.description}
-                                            </TableCell>
+                        <TabsTrigger value="payroll">
+                            Payroll History
+                        </TabsTrigger>
 
-                                            <TableCell
-                                                className={
-                                                    Number(transaction.amount) <
-                                                    0
-                                                        ? 'font-medium text-green-400'
-                                                        : 'font-medium text-red-400'
-                                                }
-                                            >
-                                                {Number(transaction.amount) > 0
-                                                    ? '- '
-                                                    : '+ '}
-                                                ₱
-                                                {Math.abs(
-                                                    Number(transaction.amount),
-                                                ).toLocaleString()}
-                                            </TableCell>
+                        <TabsTrigger value="deductions">Deductions</TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent value="transactions">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Employee Transactions</CardTitle>
+                            </CardHeader>
+
+                            <CardContent>
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead>Description</TableHead>
+                                            <TableHead>Amount</TableHead>
                                         </TableRow>
-                                    ))
-                                ) : (
-                                    <TableRow>
-                                        <TableCell
-                                            colSpan={3}
-                                            className="py-8 text-center text-muted-foreground"
-                                        >
-                                            No transactions found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                                    </TableHeader>
+
+                                    <TableBody>
+                                        {employee.transactions?.length ? (
+                                            employee.transactions.map(
+                                                (transaction) => (
+                                                    <TableRow
+                                                        key={transaction.id}
+                                                    >
+                                                        <TableCell>
+                                                            {formatDateTime(
+                                                                transaction.created_at,
+                                                            )}
+                                                        </TableCell>
+
+                                                        <TableCell>
+                                                            {
+                                                                transaction.description
+                                                            }
+                                                        </TableCell>
+
+                                                        <TableCell
+                                                            className={
+                                                                Number(
+                                                                    transaction.amount,
+                                                                ) < 0
+                                                                    ? 'font-medium text-red-400'
+                                                                    : 'font-medium text-green-400'
+                                                            }
+                                                        >
+                                                            {Number(
+                                                                transaction.amount,
+                                                            ) > 0
+                                                                ? '+ '
+                                                                : '- '}
+                                                            ₱
+                                                            {Math.abs(
+                                                                Number(
+                                                                    transaction.amount,
+                                                                ),
+                                                            ).toLocaleString()}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ),
+                                            )
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={3}
+                                                    className="py-8 text-center text-muted-foreground"
+                                                >
+                                                    No transactions found.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    <TabsContent value="driven">
+                        <TabsContent value="driven">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Driven Trips</CardTitle>
+                                </CardHeader>
+
+                                <CardContent>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Truck</TableHead>
+                                                <TableHead>Trip Type</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+
+                                        <TableBody>
+                                            {employee.driven_trips.length ? (
+                                                employee.driven_trips.map(
+                                                    (trip) => (
+                                                        <TableRow key={trip.id}>
+                                                            <TableCell>
+                                                                {formatDate(
+                                                                    trip.trip_date,
+                                                                )}
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {
+                                                                    trip.truck
+                                                                        .alias
+                                                                }
+                                                            </TableCell>
+
+                                                            <TableCell className="capitalize">
+                                                                {trip.trip_type}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={3}
+                                                        className="py-8 text-center text-muted-foreground"
+                                                    >
+                                                        No driven trips.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </TabsContent>
+
+                    <TabsContent value="assisted">
+                        <TabsContent value="assisted">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Assisted Trips</CardTitle>
+                                </CardHeader>
+
+                                <CardContent>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Date</TableHead>
+                                                <TableHead>Truck</TableHead>
+                                                <TableHead>Trip Type</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+
+                                        <TableBody>
+                                            {employee.assisted_trips.length ? (
+                                                employee.assisted_trips.map(
+                                                    (trip) => (
+                                                        <TableRow key={trip.id}>
+                                                            <TableCell>
+                                                                {formatDate(
+                                                                    trip.trip_date,
+                                                                )}
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {
+                                                                    trip.truck
+                                                                        .alias
+                                                                }
+                                                            </TableCell>
+
+                                                            <TableCell className="capitalize">
+                                                                {trip.trip_type}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={3}
+                                                        className="py-8 text-center text-muted-foreground"
+                                                    >
+                                                        No driven trips.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </TabsContent>
+
+                    <TabsContent value="payroll">
+                        <TabsContent value="payroll">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Payroll History</CardTitle>
+                                </CardHeader>
+
+                                <CardContent>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>
+                                                    Payroll Period
+                                                </TableHead>
+
+                                                <TableHead>Days</TableHead>
+
+                                                <TableHead>Hours</TableHead>
+
+                                                <TableHead>Trips</TableHead>
+
+                                                <TableHead>Gross Pay</TableHead>
+
+                                                <TableHead>
+                                                    Deductions
+                                                </TableHead>
+
+                                                <TableHead>Net Pay</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+
+                                        <TableBody>
+                                            {employee.payroll_items?.length ? (
+                                                employee.payroll_items.map(
+                                                    (item) => (
+                                                        <TableRow
+                                                            key={item.id}
+                                                            className="cursor-pointer"
+                                                            onClick={() =>
+                                                                router.visit(
+                                                                    `/payroll/${item.payroll.id}`,
+                                                                )
+                                                            }
+                                                        >
+                                                            <TableCell>
+                                                                <span className="font-medium">
+                                                                    {formatDate(
+                                                                        item
+                                                                            .payroll
+                                                                            .start_date,
+                                                                    )}
+                                                                </span>{' '}
+                                                                →{' '}
+                                                                <span className="font-medium">
+                                                                    {formatDate(
+                                                                        item
+                                                                            .payroll
+                                                                            .end_date,
+                                                                    )}
+                                                                </span>
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {
+                                                                    item.days_worked
+                                                                }
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {
+                                                                    item.work_hours
+                                                                }
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {
+                                                                    item.delivery_count
+                                                                }
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                ₱
+                                                                {Number(
+                                                                    item.gross_pay,
+                                                                ).toLocaleString()}
+                                                            </TableCell>
+
+                                                            <TableCell className="text-red-500">
+                                                                ₱
+                                                                {Number(
+                                                                    item.deductions,
+                                                                ).toLocaleString()}
+                                                            </TableCell>
+
+                                                            <TableCell className="font-semibold text-green-600">
+                                                                ₱
+                                                                {Number(
+                                                                    item.net_pay,
+                                                                ).toLocaleString()}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={7}
+                                                        className="py-8 text-center text-muted-foreground"
+                                                    >
+                                                        No payroll history
+                                                        found.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </TabsContent>
+
+                    <TabsContent value="deductions">
+                        <TabsContent value="deductions">
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle>Deductions</CardTitle>
+                                </CardHeader>
+
+                                <CardContent>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead>Date</TableHead>
+
+                                                <TableHead>Type</TableHead>
+
+                                                <TableHead>Amount</TableHead>
+
+                                                <TableHead>Remarks</TableHead>
+
+                                                <TableHead>Status</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+
+                                        <TableBody>
+                                            {employee.deductions?.length ? (
+                                                employee.deductions.map(
+                                                    (deduction) => (
+                                                        <TableRow
+                                                            key={deduction.id}
+                                                        >
+                                                            <TableCell>
+                                                                {formatDate(
+                                                                    deduction.date,
+                                                                )}
+                                                            </TableCell>
+
+                                                            <TableCell className="capitalize">
+                                                                {deduction.type.replaceAll(
+                                                                    '_',
+                                                                    ' ',
+                                                                )}
+                                                            </TableCell>
+
+                                                            <TableCell className="font-medium text-red-500">
+                                                                ₱
+                                                                {Number(
+                                                                    deduction.amount,
+                                                                ).toLocaleString()}
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {deduction.remarks ||
+                                                                    '-'}
+                                                            </TableCell>
+
+                                                            <TableCell>
+                                                                {deduction.payroll_id ? (
+                                                                    <Badge className="bg-green-500 hover:bg-green-600">
+                                                                        Included
+                                                                        in
+                                                                        Payroll
+                                                                    </Badge>
+                                                                ) : deduction.added_to_balance ? (
+                                                                    <Badge className="bg-orange-500 hover:bg-orange-600">
+                                                                        Added to
+                                                                        Balance
+                                                                    </Badge>
+                                                                ) : (
+                                                                    <Badge variant="secondary">
+                                                                        Pending
+                                                                    </Badge>
+                                                                )}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ),
+                                                )
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell
+                                                        colSpan={5}
+                                                        className="py-8 text-center text-muted-foreground"
+                                                    >
+                                                        No deductions found.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </CardContent>
+                            </Card>
+                        </TabsContent>
+                    </TabsContent>
+                </Tabs>
             </div>
         </>
     );
