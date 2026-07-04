@@ -27,6 +27,11 @@ class PayrollItem extends Model
 
         'gross_pay',
         'net_pay',
+
+        // Add these
+        'outstanding_balance',
+        'balance_recovery',
+        'salary_released',
     ];
 
     protected $casts = [
@@ -39,12 +44,18 @@ class PayrollItem extends Model
         'basic_pay' => 'decimal:2',
         'trip_pay' => 'decimal:2',
         'overtime_pay' => 'decimal:2',
+
         'days_worked' => 'decimal:2',
 
         'deductions' => 'decimal:2',
 
         'gross_pay' => 'decimal:2',
         'net_pay' => 'decimal:2',
+
+        // Add these
+        'outstanding_balance' => 'decimal:2',
+        'balance_recovery' => 'decimal:2',
+        'salary_released' => 'decimal:2',
     ];
 
     public function payroll()

@@ -114,9 +114,15 @@ class PayrollController extends Controller
     }
 
     public function finalize(
+        Request $request,
         Payroll $payroll,
         PayrollCalculator $calculator
     ) {
+        $validated = $request->validate([
+            'balance_recoveries' => ['sometimes', 'array'],
+            'balance_recoveries.*' => ['required', 'numeric', 'min:0'],
+        ]);
+
         if ($payroll->status === 'finalized') {
             return back()->withErrors([
                 'payroll' => 'Payroll has already been finalized.',
@@ -125,10 +131,13 @@ class PayrollController extends Controller
 
         DB::transaction(function () use (
             $payroll,
-            $calculator
+            $calculator,
+            $validated
         ) {
-
-            $calculator->finalize($payroll);
+            $calculator->finalize(
+                $payroll,
+                $validated['balance_recoveries'] ?? []
+            );
         });
 
         return back()->with(

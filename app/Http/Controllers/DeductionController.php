@@ -102,7 +102,37 @@ class DeductionController extends Controller
             ],
         ]);
 
-        Deduction::create($validated);
+        $deduction = Deduction::create($validated);
+
+        $coveredByPayroll = Payroll::where('status', 'finalized')
+            ->whereDate('start_date', '<=', $deduction->date)
+            ->whereDate('end_date', '>=', $deduction->date)
+            ->exists();
+
+        $filingStatus = $coveredByPayroll
+            ? 'Late Filing'
+            : 'Early Filing';
+
+        EmployeeTransaction::create([
+            'employee_id' => $deduction->employee_id,
+
+            'type' => 'deduction',
+
+            'amount' => $deduction->amount,
+
+            'description' => sprintf(
+                '%s - %s',
+                $filingStatus,
+                str_replace('_', ' ', $deduction->type)
+            ),
+
+            'deduction_id' => $deduction->id,
+        ]);
+
+        $deduction->update([
+            'added_to_balance' => true,
+            'added_to_balance_at' => now(),
+        ]);
 
         return redirect()
             ->route('deductions.index')

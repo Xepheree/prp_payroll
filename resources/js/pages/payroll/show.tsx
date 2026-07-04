@@ -31,6 +31,7 @@ import {
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 
 interface PayrollItem {
     id: number;
@@ -81,27 +82,46 @@ export default function Show() {
 
     const [openFinalize, setOpenFinalize] = useState(false);
     const [confirmed, setConfirmed] = useState(false);
+    const [balanceRecoveries, setBalanceRecoveries] = useState<
+        Record<number, number>
+    >({});
+
+    // const finalizePayroll = () => {
+    //     router.post(
+    //         `/payroll/${payroll.id}/finalize`,
+    //         {
+    //             balance_recoveries: balanceRecoveries,
+    //         },
+    //         {
+    //             preserveScroll: true,
+
+    //             onSuccess: () => {
+    //                 toast.success('Payroll finalized successfully.');
+    //                 setOpenFinalize(false);
+    //                 setConfirmed(false);
+    //             },
+
+    //             onError: (errors) => {
+    //                 const firstError = Object.values(errors)[0];
+
+    //                 if (firstError) {
+    //                     toast.error(firstError as string);
+    //                 }
+    //             },
+    //         },
+    //     );
+    // };
 
     const finalizePayroll = () => {
+        console.log(balanceRecoveries);
+
         router.post(
             `/payroll/${payroll.id}/finalize`,
-            {},
+            {
+                balance_recoveries: balanceRecoveries,
+            },
             {
                 preserveScroll: true,
-
-                onSuccess: () => {
-                    toast.success('Payroll finalized successfully.');
-                    setOpenFinalize(false);
-                    setConfirmed(false);
-                },
-
-                onError: (errors) => {
-                    const firstError = Object.values(errors)[0];
-
-                    if (firstError) {
-                        toast.error(firstError as string);
-                    }
-                },
             },
         );
     };
@@ -199,7 +219,11 @@ export default function Show() {
 
                                     <TableHead>Gross</TableHead>
 
-                                    <TableHead>Deductions</TableHead>
+                                    <TableHead>Outstanding</TableHead>
+
+                                    <TableHead>Recover</TableHead>
+
+                                    <TableHead>Salary Released</TableHead>
 
                                     <TableHead>Net Pay</TableHead>
                                 </TableRow>
@@ -242,8 +266,107 @@ export default function Show() {
                                         <TableCell>
                                             ₱
                                             {Number(
-                                                item.deductions,
+                                                item.outstanding_balance,
                                             ).toLocaleString()}
+                                        </TableCell>
+
+                                        <TableCell className="w-40">
+                                            <TableCell>
+                                                {payroll.status === 'draft' ? (
+                                                    <Input
+                                                        type="number"
+                                                        min={0}
+                                                        max={Math.min(
+                                                            Number(
+                                                                item.outstanding_balance,
+                                                            ),
+                                                            Number(
+                                                                item.net_pay,
+                                                            ),
+                                                        )}
+                                                        value={
+                                                            balanceRecoveries[
+                                                                item.employee.id
+                                                            ] ?? ''
+                                                        }
+                                                        // onChange={(e) => {
+                                                        //     const value =
+                                                        //         Number(
+                                                        //             e.target
+                                                        //                 .value,
+                                                        //         );
+
+                                                        //     setBalanceRecoveries(
+                                                        //         (current) => ({
+                                                        //             ...current,
+                                                        //             [item
+                                                        //                 .employee
+                                                        //                 .id]:
+                                                        //                 Math.min(
+                                                        //                     Math.max(
+                                                        //                         value,
+                                                        //                         0,
+                                                        //                     ),
+                                                        //                     Math.min(
+                                                        //                         Number(
+                                                        //                             item.outstanding_balance,
+                                                        //                         ),
+                                                        //                         Number(
+                                                        //                             item.net_pay,
+                                                        //                         ),
+                                                        //                     ),
+                                                        //                 ),
+                                                        //         }),
+                                                        //     );
+                                                        // }}
+
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                Number(
+                                                                    e.target
+                                                                        .value,
+                                                                );
+
+                                                            console.log(
+                                                                'changed',
+                                                                item.employee
+                                                                    .id,
+                                                                value,
+                                                            );
+
+                                                            setBalanceRecoveries(
+                                                                (current) => ({
+                                                                    ...current,
+                                                                    [item
+                                                                        .employee
+                                                                        .id]:
+                                                                        value,
+                                                                }),
+                                                            );
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <>
+                                                        ₱
+                                                        {Number(
+                                                            item.balance_recovery,
+                                                        ).toLocaleString()}
+                                                    </>
+                                                )}
+                                            </TableCell>
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {payroll.status === 'draft'
+                                                ? (
+                                                      Number(item.net_pay) -
+                                                      (balanceRecoveries[
+                                                          item.employee.id
+                                                      ] ?? 0)
+                                                  ).toLocaleString()
+                                                : Number(
+                                                      item.salary_released,
+                                                  ).toLocaleString()}
                                         </TableCell>
 
                                         <TableCell className="font-medium">

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('payroll_items', function (Blueprint $table) {
-            $table->decimal('balance_recovery', 10, 2)->default(0)->after('deductions');
-
-            $table->decimal('salary_released', 10, 2)->default(0)->after('balance_recovery');
+            $table->decimal('outstanding_balance', 12, 2)->default(0)->after('net_pay');
+            $table->decimal('balance_recovery', 12, 2)->default(0)->after('outstanding_balance');
+            $table->decimal('salary_released', 12, 2)->default(0)->after('balance_recovery');
         });
     }
 

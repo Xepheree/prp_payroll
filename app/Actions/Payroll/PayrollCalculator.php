@@ -18,9 +18,20 @@ class PayrollCalculator
       'items.employee',
     ])->findOrFail($payroll->attendance_id);
 
+    $balances = EmployeeTransaction::query()
+      ->selectRaw('employee_id, SUM(amount) as balance')
+      ->groupBy('employee_id')
+      ->pluck('balance', 'employee_id');
+
     $items = $attendance->items
       ->groupBy('employee_id')
-      ->map(function ($employeeItems) use ($attendance, $payroll) {
+      ->map(function ($employeeItems) use (
+        $attendance,
+        $payroll,
+        $balances
+      ) {
+
+
 
         $employee = $employeeItems->first()->employee;
 
@@ -73,29 +84,10 @@ class PayrollCalculator
 
         $deliveryCount = $deliveries->count();
 
-        /*
-                |--------------------------------------------------------------------------
-                | Deductions
-                |--------------------------------------------------------------------------
-                */
-
-        $employeeDeductions = Deduction::query()
-          ->when(
-            $payroll->status === 'draft',
-            fn($q) => $q->whereNull('payroll_id')
-          )
-          ->where('employee_id', $employee->id)
-          ->where(function ($query) {
-            $query->whereNull('added_to_balance')
-              ->orWhere('added_to_balance', false);
-          })
-          ->whereBetween('date', [
-            $attendance->period_start,
-            $attendance->period_end,
-          ])
-          ->get();
-
-        $deductions = $employeeDeductions->sum('amount');
+        $outstandingBalance = max(
+          0,
+          $balances[$employee->id] ?? 0
+        );
 
         /*
                 |--------------------------------------------------------------------------
@@ -111,7 +103,7 @@ class PayrollCalculator
 
         $grossPay = $basicPay + $tripPay + $overtimePay;
 
-        $netPay = $grossPay - $deductions;
+        $netPay = $grossPay;
 
         return [
           'employee' => $employee,
@@ -131,14 +123,19 @@ class PayrollCalculator
           'trip_pay' => $tripPay,
           'overtime_pay' => $overtimePay,
 
-          'deductions' => $deductions,
+          'payroll_deductions' => 0,
+
+          'outstanding_balance' => $outstandingBalance,
+
+          'balance_recovery' => 0,
+
+          'salary_released' => $netPay,
 
           'gross_pay' => $grossPay,
           'net_pay' => $netPay,
 
           // Used during finalize()
           'delivery_ids' => $deliveries->pluck('id'),
-          'deduction_ids' => $employeeDeductions->pluck('id'),
         ];
       })
       ->values();
@@ -153,11 +150,26 @@ class PayrollCalculator
     ];
   }
 
-  public function finalize(Payroll $payroll): void
-  {
+  public function finalize(
+    Payroll $payroll,
+    array $balanceRecoveries
+  ): void {
     $preview = $this->preview($payroll);
 
     foreach ($preview['items'] as $item) {
+
+
+
+      $recovery = min(
+        max(
+          0,
+          $balanceRecoveries[$item['employee']->id] ?? 0
+        ),
+        $item['outstanding_balance'],
+        $item['net_pay']
+      );
+
+      $salaryReleased = $item['net_pay'] - $recovery;
 
       PayrollItem::create([
         'payroll_id' => $payroll->id,
@@ -176,10 +188,29 @@ class PayrollCalculator
         'trip_pay' => $item['trip_pay'],
         'overtime_pay' => $item['overtime_pay'],
 
-        'deductions' => $item['deductions'],
+        'deductions' => $item['payroll_deductions'],
 
         'gross_pay' => $item['gross_pay'],
         'net_pay' => $item['net_pay'],
+        'outstanding_balance' => $item['outstanding_balance'],
+        'balance_recovery' => $recovery,
+        'salary_released' => $salaryReleased,
+      ]);
+
+      EmployeeTransaction::create([
+        'employee_id' => $item['employee']->id,
+
+        'type' => 'salary_release',
+
+        'amount' => $salaryReleased,
+
+        'description' => sprintf(
+          'Salary Released %s - %s',
+          Carbon::parse($payroll->start_date)->format('M d, Y'),
+          Carbon::parse($payroll->end_date)->format('M d, Y'),
+        ),
+
+        'payroll_id' => $payroll->id,
       ]);
 
       EmployeeTransaction::create([
@@ -198,15 +229,10 @@ class PayrollCalculator
         'payroll_id' => $payroll->id,
       ]);
 
+
+
       if ($item['delivery_ids']->isNotEmpty()) {
         Trip::whereIn('id', $item['delivery_ids'])
-          ->update([
-            'payroll_id' => $payroll->id,
-          ]);
-      }
-
-      if ($item['deduction_ids']->isNotEmpty()) {
-        Deduction::whereIn('id', $item['deduction_ids'])
           ->update([
             'payroll_id' => $payroll->id,
           ]);
