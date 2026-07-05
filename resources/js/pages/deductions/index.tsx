@@ -16,12 +16,24 @@ import {
 } from '@/components/ui/table';
 import CreateDeductionModal from '@/components/custom/modals/deductions/CreateDeductionModal';
 import { formatDate, formatDateTime } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 
 interface Employee {
     id: number;
     name: string;
     balance: number | null;
     updated_at: string;
+}
+
+interface PageProps {
+    deductions: Deduction[];
+    employees: Employee[];
+    from?: string;
+
+    filters: {
+        start_date: string | null;
+        end_date: string | null;
+    };
 }
 
 interface Deduction {
@@ -57,7 +69,12 @@ export default function Index() {
     const [selectedDeduction, setSelectedDeduction] =
         useState<Deduction | null>(null);
 
-    const { deductions, employees } = usePage().props as unknown as PageProps;
+    const { deductions, employees, filters, from } = usePage()
+        .props as unknown as PageProps;
+    const [dateFilters, setDateFilters] = useState({
+        start_date: filters.start_date ?? '',
+        end_date: filters.end_date ?? '',
+    });
 
     const groupedDeductions = deductions.reduce(
         (groups, deduction) => {
@@ -187,6 +204,78 @@ export default function Index() {
                 <Card>
                     <CardHeader>
                         <CardTitle>All Deductions</CardTitle>
+
+                        <div className="flex items-end gap-4">
+                            <div>
+                                <Label>From</Label>
+                                <Input
+                                    type="date"
+                                    value={dateFilters.start_date}
+                                    onChange={(e) =>
+                                        setDateFilters({
+                                            ...dateFilters,
+                                            start_date: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <div>
+                                <Label>To</Label>
+                                <Input
+                                    type="date"
+                                    value={dateFilters.end_date}
+                                    onChange={(e) =>
+                                        setDateFilters({
+                                            ...dateFilters,
+                                            end_date: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <Button
+                                onClick={() =>
+                                    router.get(
+                                        '/deductions',
+                                        {
+                                            start_date: dateFilters.start_date,
+                                            end_date: dateFilters.end_date,
+                                            from,
+                                        },
+                                        {
+                                            preserveState: true,
+                                            replace: true,
+                                        },
+                                    )
+                                }
+                            >
+                                Filter
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    setDateFilters({
+                                        start_date: '',
+                                        end_date: '',
+                                    });
+
+                                    router.get(
+                                        '/deductions',
+                                        {
+                                            from,
+                                        },
+                                        {
+                                            preserveState: true,
+                                            replace: true,
+                                        },
+                                    );
+                                }}
+                            >
+                                Clear
+                            </Button>
+                        </div>
                     </CardHeader>
 
                     <CardContent>

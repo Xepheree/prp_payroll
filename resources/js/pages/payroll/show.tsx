@@ -203,77 +203,120 @@ export default function Show() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Employee</TableHead>
+                                    <TableHead className="border-r">
+                                        Employee
+                                    </TableHead>
 
-                                    <TableHead>Days</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Days
+                                    </TableHead>
 
-                                    <TableHead>Hours</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Hours
+                                    </TableHead>
 
-                                    <TableHead>OT</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        OT
+                                    </TableHead>
 
-                                    <TableHead>OT Pay</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        OT Pay
+                                    </TableHead>
 
-                                    <TableHead>Trips</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Trips
+                                    </TableHead>
 
-                                    <TableHead>Trip Pay</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Trip Pay
+                                    </TableHead>
 
-                                    <TableHead>Gross</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Gross
+                                    </TableHead>
 
-                                    <TableHead>Outstanding</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Outstanding
+                                    </TableHead>
 
-                                    <TableHead>Recover</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Recover
+                                    </TableHead>
 
-                                    <TableHead>Salary Released</TableHead>
+                                    <TableHead className="border-r text-center">
+                                        Salary Released
+                                    </TableHead>
 
-                                    <TableHead>Net Pay</TableHead>
+                                    {/* <TableHead>Net Pay</TableHead> */}
                                 </TableRow>
                             </TableHeader>
 
                             <TableBody>
                                 {items.map((item) => (
                                     <TableRow key={item.id}>
-                                        <TableCell>
+                                        <TableCell className="border-r font-medium">
                                             {item.employee.name}
+
+                                            <div className="text-xs text-muted-foreground">
+                                                {`${item.employee.designation} || ₱${item.employee.rate}/day`}
+                                            </div>
                                         </TableCell>
 
-                                        <TableCell>
-                                            {item.days_worked}
+                                        <TableCell className="border-r text-center">
+                                            {Number(
+                                                item.days_worked,
+                                            ).toLocaleString()}
                                         </TableCell>
 
-                                        <TableCell>{item.work_hours}</TableCell>
-
-                                        <TableCell>
-                                            {item.overtime_hours}
+                                        <TableCell className="border-r text-center">
+                                            {Number(
+                                                item.work_hours,
+                                            ).toLocaleString()}
                                         </TableCell>
 
-                                        <TableCell>
-                                            {item.overtime_pay}
+                                        <TableCell className="border-r text-center">
+                                            {Number(
+                                                item.overtime_hours,
+                                            ).toLocaleString()}
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="border-r text-center">
+                                            ₱
+                                            {Number(
+                                                item.overtime_pay,
+                                            ).toLocaleString()}
+                                        </TableCell>
+
+                                        <TableCell className="border-r text-center">
                                             {item.delivery_count}
                                         </TableCell>
 
-                                        <TableCell>{item.trip_pay}</TableCell>
+                                        <TableCell className="border-r text-center">
+                                            ₱
+                                            {Number(
+                                                item.trip_pay,
+                                            ).toLocaleString()}
+                                        </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="border-r text-center">
                                             ₱
                                             {Number(
                                                 item.gross_pay,
                                             ).toLocaleString()}
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="border-r text-center">
                                             ₱
                                             {Number(
                                                 item.outstanding_balance,
                                             ).toLocaleString()}
                                         </TableCell>
 
-                                        <TableCell className="w-40">
-                                            <TableCell>
+                                        <TableCell className="border-r text-center">
+                                            <TableCell className="text-center">
                                                 {payroll.status === 'draft' ? (
                                                     <Input
+                                                        className="border-r text-center"
                                                         type="number"
                                                         min={0}
                                                         max={Math.min(
@@ -346,17 +389,18 @@ export default function Show() {
                                                         }}
                                                     />
                                                 ) : (
-                                                    <>
+                                                    <div className="text-center">
                                                         ₱
                                                         {Number(
                                                             item.balance_recovery,
                                                         ).toLocaleString()}
-                                                    </>
+                                                    </div>
                                                 )}
                                             </TableCell>
                                         </TableCell>
 
-                                        <TableCell>
+                                        <TableCell className="border-r text-center">
+                                            ₱
                                             {payroll.status === 'draft'
                                                 ? (
                                                       Number(item.net_pay) -
@@ -369,12 +413,12 @@ export default function Show() {
                                                   ).toLocaleString()}
                                         </TableCell>
 
-                                        <TableCell className="font-medium">
+                                        {/* <TableCell className="font-medium">
                                             ₱
                                             {Number(
                                                 item.net_pay,
                                             ).toLocaleString()}
-                                        </TableCell>
+                                        </TableCell> */}
                                     </TableRow>
                                 ))}
                             </TableBody>

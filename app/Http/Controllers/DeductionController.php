@@ -12,12 +12,18 @@ use App\Models\EmployeeTransaction;
 
 class DeductionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $deductions = Deduction::with([
             'employee',
             'payroll',
         ])
+            ->when($request->filled('start_date'), function ($query) use ($request) {
+                $query->whereDate('date', '>=', $request->start_date);
+            })
+            ->when($request->filled('end_date'), function ($query) use ($request) {
+                $query->whereDate('date', '<=', $request->end_date);
+            })
             ->latest('created_at')
             ->get()
             ->map(function ($deduction) {
@@ -25,16 +31,8 @@ class DeductionController extends Controller
                 $deduction->can_add_to_balance =
                     $deduction->payroll_id === null &&
                     Payroll::where('status', 'finalized')
-                    ->whereDate(
-                        'start_date',
-                        '<=',
-                        $deduction->date
-                    )
-                    ->whereDate(
-                        'end_date',
-                        '>=',
-                        $deduction->date
-                    )
+                    ->whereDate('start_date', '<=', $deduction->date)
+                    ->whereDate('end_date', '>=', $deduction->date)
                     ->exists();
 
                 return $deduction;
@@ -47,6 +45,11 @@ class DeductionController extends Controller
                 'status',
                 'active'
             )->get(),
+
+            'filters' => [
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+            ],
 
             'breadcrumbs' => request('from') === 'payroll'
                 ? [

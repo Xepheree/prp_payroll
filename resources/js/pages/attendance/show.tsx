@@ -289,59 +289,6 @@ export default function Show() {
                     </CardContent>
                 </Card>
             </div>
-
-            {/* <AlertDialog
-                open={publishOpen}
-                onOpenChange={(open) => {
-                    setPublishOpen(open);
-
-                    if (!open) {
-                        setReviewed(false);
-                    }
-                }}
-            >
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Publish Attendance?</AlertDialogTitle>
-
-                        <AlertDialogDescription>
-                            Once published, this attendance will be locked and
-                            used for payroll calculations. Make sure all work
-                            hours are correct before proceeding.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-
-                    <div className="flex items-start space-x-2 py-2">
-                        <Checkbox
-                            className="mt-1"
-                            id="reviewed"
-                            checked={reviewed}
-                            onCheckedChange={(checked) =>
-                                setReviewed(checked === true)
-                            }
-                        />
-
-                        <label
-                            htmlFor="reviewed"
-                            className="text-sm leading-relaxed"
-                        >
-                            I have reviewed the attendance data and confirm that
-                            all work hours are correct.
-                        </label>
-                    </div>
-
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-
-                        <AlertDialogAction
-                            disabled={!reviewed}
-                            onClick={publishAttendance}
-                        >
-                            Publish
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog> */}
         </>
     );
 }
