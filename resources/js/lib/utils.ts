@@ -27,3 +27,13 @@ export const formatDateTime = (date: string) => {
         minute: '2-digit',
     });
 };
+
+export function loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve) => {
+        const image = new Image();
+
+        image.src = src;
+
+        image.onload = () => resolve(image);
+    });
+}

@@ -68,11 +68,11 @@ export function AppSidebar() {
                       href: '/payroll',
                       icon: PhilippinePeso,
                   },
-                  {
-                      title: 'Payment Vouchers',
-                      href: '/payment-vouchers',
-                      icon: ReceiptText,
-                  },
+                  //   {
+                  //       title: 'Payment Vouchers',
+                  //       href: '/payment-vouchers',
+                  //       icon: ReceiptText,
+                  //   },
                   //   {
                   //       title: 'Billings',
                   //       href: '/billings',

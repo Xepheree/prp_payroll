@@ -24,6 +24,7 @@ return new class extends Migration
                 'adjustment',
                 'payment',
                 'bonus',
+                'salary_release',
             ]);
 
             // Positive = Employee owes company

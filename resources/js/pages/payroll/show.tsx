@@ -32,6 +32,9 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { exportPayslip } from '@/lib/pdf/payslip';
+import { FileText } from 'lucide-react';
+import { exportBatchPayslips } from '@/lib/pdf/batchPayslip';
 
 interface PayrollItem {
     id: number;
@@ -141,9 +144,21 @@ export default function Show() {
                         </p>
                     </div>
 
-                    {payroll.status === 'draft' && (
+                    {payroll.status === 'draft' ? (
                         <Button onClick={() => setOpenFinalize(true)}>
                             Finalize Payroll
+                        </Button>
+                    ) : (
+                        <Button
+                            onClick={() =>
+                                exportBatchPayslips(
+                                    items,
+                                    payroll.start_date,
+                                    payroll.end_date,
+                                )
+                            }
+                        >
+                            Print Payslips
                         </Button>
                     )}
                 </div>
@@ -248,6 +263,10 @@ export default function Show() {
                                     </TableHead>
 
                                     {/* <TableHead>Net Pay</TableHead> */}
+
+                                    {payroll.status === 'finalized' && (
+                                        <TableHead>Actions</TableHead>
+                                    )}
                                 </TableRow>
                             </TableHeader>
 
@@ -258,7 +277,14 @@ export default function Show() {
                                             {item.employee.name}
 
                                             <div className="text-xs text-muted-foreground">
-                                                {`${item.employee.designation} || ₱${item.employee.rate}/day`}
+                                                {`${
+                                                    item.employee.designation
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                    item.employee.designation.slice(
+                                                        1,
+                                                    )
+                                                } @ ₱${Number(item.employee.rate)} /day`}
                                             </div>
                                         </TableCell>
 
@@ -318,6 +344,7 @@ export default function Show() {
                                                     <Input
                                                         className="border-r text-center"
                                                         type="number"
+                                                        placeholder="0"
                                                         min={0}
                                                         max={Math.min(
                                                             Number(
@@ -419,6 +446,26 @@ export default function Show() {
                                                 item.net_pay,
                                             ).toLocaleString()}
                                         </TableCell> */}
+
+                                        {payroll.status === 'finalized' && (
+                                            <TableCell>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="icon"
+                                                        onClick={() =>
+                                                            exportPayslip(
+                                                                item,
+                                                                payroll.start_date,
+                                                                payroll.end_date,
+                                                            )
+                                                        }
+                                                    >
+                                                        <FileText className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        )}
                                     </TableRow>
                                 ))}
                             </TableBody>

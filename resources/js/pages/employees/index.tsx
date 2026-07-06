@@ -1,5 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
-import { Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import { useState } from 'react';
 import EmployeeRow from '@/components/custom/EmployeeRow';
 import EmptyState from '@/components/custom/EmptyState';
@@ -15,6 +15,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { exportEmployeeMasterlist } from '@/lib/pdf/employee-masterlist';
 
 export default function Index() {
     const { employees } = usePage().props as any;
@@ -44,15 +45,25 @@ export default function Index() {
                         </p>
                     </div>
                     {employees.length !== 0 && (
-                        <Button
-                            onClick={() => {
-                                setEditingEmployee(null);
-                                setOpenCreate(true);
-                            }}
-                        >
-                            <Plus className="mr-2 h-4 w-4" />
-                            Add Employee
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            <Button
+                                onClick={() =>
+                                    exportEmployeeMasterlist(employees)
+                                }
+                            >
+                                <FileText className="mr-2 h-4 w-4" />
+                                Export PDF
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setEditingEmployee(null);
+                                    setOpenCreate(true);
+                                }}
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Add Employee
+                            </Button>
+                        </div>
                     )}
                 </div>
 
