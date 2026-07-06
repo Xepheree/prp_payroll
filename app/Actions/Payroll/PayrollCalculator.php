@@ -75,7 +75,10 @@ class PayrollCalculator
             $attendance->period_start,
             $attendance->period_end,
           ])
-          ->where('trip_type', 'deliver')
+          ->whereIn('trip_type', [
+            'deliver',
+            'backload',
+          ])
           ->where(function ($query) use ($employee) {
             $query->where('driver_id', $employee->id)
               ->orWhere('helper_id', $employee->id);

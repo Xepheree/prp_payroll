@@ -82,15 +82,15 @@ export async function drawPayslip(
     doc.setFontSize(16 * scale);
 
     // TITLE
-    doc.text('PRP 413 LOGISTICS', X(105 / 2 + 18), Y(16), {
+    doc.text('PRP 413 LOGISTICS', X(148 / 2), Y(16), {
         align: 'center',
     });
 
-    doc.text('EMPLOYEE PAYSLIP', X(105 / 2 + 18), Y(23), {
+    doc.text('EMPLOYEE PAYSLIP', X(148 / 2), Y(23), {
         align: 'center',
     });
 
-    doc.text(`${payrollPeriod}`, X(105 / 2 + 18), Y(29), {
+    doc.text(`${payrollPeriod}`, X(148 / 2), Y(29), {
         align: 'center',
     });
 
@@ -102,27 +102,27 @@ export async function drawPayslip(
 
     doc.text('Name:', X(10), Y(45));
     doc.text('Position:', X(10), Y(52));
-    doc.text('Paid Days:', X(10), Y(59));
+    doc.text('Days:', X(10), Y(59));
 
-    doc.text('OT:', X(87), Y(45));
-    doc.text('Trip:', X(87), Y(52));
+    doc.text('OT:', X(97), Y(45));
+    doc.text('Trip:', X(97), Y(52));
 
     doc.setFont('helvetica', 'normal');
 
-    doc.text(item.employee.name, X(50), Y(45));
+    doc.text(item.employee.name, X(40), Y(45));
 
     doc.text(
         item.employee.designation.charAt(0).toUpperCase() +
             item.employee.designation.slice(1),
-        X(50),
+        X(40),
         Y(52),
     );
 
-    doc.text(`${item.days_worked}`, X(50), Y(59));
+    doc.text(`${item.days_worked}`, X(40), Y(59));
 
-    doc.text(`${item.overtime_hours} hrs`, X(108), Y(45));
+    doc.text(`${item.overtime_hours} hrs`, X(113), Y(45));
 
-    doc.text(`${item.delivery_count}`, X(108), Y(52));
+    doc.text(`${item.delivery_count}`, X(113), Y(52));
 
     // EARNINGS
     doc.setLineWidth(0.3);
@@ -140,44 +140,12 @@ export async function drawPayslip(
 
     moneyRow(doc, 'Gross Pay', item.gross_pay, x, Y(107), true, scale);
 
-    moneyRow(
-        doc,
-        'Outstanding Balance',
-        item.outstanding_balance,
-        x,
-        Y(128),
-        false,
-        scale,
-    );
-
-    moneyRow(
-        doc,
-        'Recovered This Payroll',
-        item.balance_recovery,
-        x,
-        Y(135),
-        false,
-        scale,
-    );
-
-    moneyRow(
-        doc,
-        'Salary Released',
-        item.salary_released,
-        x,
-        Y(146),
-        true,
-        scale,
-    );
-
     doc.line(X(10), Y(100), X(128), Y(100));
-
-    moneyRow(doc, 'Gross Pay', item.gross_pay, x, Y(107), true, scale);
 
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11 * scale);
 
-    doc.text('BALANCE RECOVERY', X(10), Y(120));
+    doc.text('CASH ADVANCE', X(10), Y(120));
 
     moneyRow(
         doc,
@@ -203,8 +171,18 @@ export async function drawPayslip(
 
     moneyRow(
         doc,
-        'Salary Released',
+        'SALARY RELEASED',
         item.salary_released,
+        x,
+        Y(156),
+        true,
+        scale,
+    );
+
+    moneyRow(
+        doc,
+        'Remaining Balance',
+        item.outstanding_balance - item.balance_recovery,
         x,
         Y(146),
         true,
@@ -222,7 +200,7 @@ export async function drawPayslip(
         align: 'center',
     });
 
-    doc.text('Authorized By', X(102.5), signatureY + 6, {
+    doc.text('Approved By', X(102.5), signatureY + 6, {
         align: 'center',
     });
 

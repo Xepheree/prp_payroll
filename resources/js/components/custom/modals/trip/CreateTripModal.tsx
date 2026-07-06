@@ -262,6 +262,9 @@ function CreateTripModal({
                                 <SelectItem value="transfer">
                                     Transfer
                                 </SelectItem>
+                                <SelectItem value="backload">
+                                    Backload
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

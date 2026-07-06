@@ -49,6 +49,7 @@ class TripController extends Controller
 
                     $trip->is_late_filing =
                         $trip->payroll_id === null &&
+                        in_array($trip->trip_type, ['deliver', 'backload']) &&
                         Payroll::where('status', 'finalized')
                         ->whereDate('start_date', '<=', $trip->trip_date)
                         ->whereDate('end_date', '>=', $trip->trip_date)
@@ -85,7 +86,7 @@ class TripController extends Controller
 
             'helper_id' => 'nullable|exists:employees,id',
 
-            'trip_type' => 'required|in:deliver,pickup,transfer',
+            'trip_type' => 'required|in:deliver,pickup,transfer,backload',
 
         ]);
 

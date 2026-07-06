@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { drawPayslip } from './payslip';
+import { formatDate } from '../utils';
 
 export async function exportBatchPayslips(
     items: PayrollItem[],
@@ -11,6 +12,8 @@ export async function exportBatchPayslips(
         unit: 'mm',
         format: 'a4',
     });
+
+    const payrollPeriod = `${formatDate(new Date(startDate))} - ${formatDate(new Date(endDate))}`;
 
     const positions = [
         { x: 0, y: 0 },
@@ -38,5 +41,5 @@ export async function exportBatchPayslips(
         }
     }
 
-    doc.save('Payroll Payslips.pdf');
+    doc.save(`Payroll Payslips - ${payrollPeriod}.pdf`);
 }

@@ -33,6 +33,7 @@ return new class extends Migration
                 'pickup',
                 'transfer',
                 'deliver',
+                'backload'
             ]);
 
             $table->timestamps();
