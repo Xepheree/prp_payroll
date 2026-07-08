@@ -93,26 +93,30 @@ export function AppSidebar() {
     ];
 
     const footerNavItems: NavItem[] = [
-        {
-            title: 'Attendance',
-            href: '/attendance',
-            icon: CalendarCheck,
-        },
-        {
-            title: 'Available Trucks',
-            href: '/trucks',
-            icon: BusFront,
-        },
-        {
-            title: 'Companies',
-            href: '/companies',
-            icon: Building2,
-        },
-        // {
-        //     title: 'Budget',
-        //     href: '/budget',
-        //     icon: PiggyBank,
-        // },
+        ...(isAdmin
+            ? [
+                  {
+                      title: 'Attendance',
+                      href: '/attendance',
+                      icon: CalendarCheck,
+                  },
+                  {
+                      title: 'Available Trucks',
+                      href: '/trucks',
+                      icon: BusFront,
+                  },
+                  {
+                      title: 'Companies',
+                      href: '/companies',
+                      icon: Building2,
+                  },
+                  // {
+                  //     title: 'Budget',
+                  //     href: '/budget',
+                  //     icon: PiggyBank,
+                  // },
+              ]
+            : []),
     ];
 
     return (
