@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf';
-import { drawPayslip } from './payslip';
 import { formatDate } from '../utils';
+import { drawPayslip } from './payslip';
 
 export async function exportBatchPayslips(
     items: PayrollItem[],

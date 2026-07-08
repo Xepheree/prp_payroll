@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BillingsController;
 use App\Http\Controllers\BudgetController;
@@ -34,6 +35,9 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // -- Employees -- //
     Route::resource('employees', EmployeeController::class);
+
+    // -- User Accounts -- //
+    Route::resource('accounts', AccountsController::class);
 
     // -- Trips -- //
     Route::resource('trips', TripController::class);
