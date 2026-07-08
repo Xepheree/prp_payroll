@@ -38,6 +38,12 @@ Route::middleware(['auth', 'role:admin,superadmin'])->group(function () {
 
     // -- User Accounts -- //
     Route::resource('accounts', AccountsController::class);
+    Route::get('/register', [AccountsController::class, 'register'])
+        ->name('accounts.register');
+    Route::post('/accounts/{account}/temporary-password', [
+        AccountsController::class,
+        'generateTemporaryPassword',
+    ])->name('accounts.temporary-password');
 
     // -- Trips -- //
     Route::resource('trips', TripController::class);
