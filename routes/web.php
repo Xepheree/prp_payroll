@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BillingsController;
 use App\Http\Controllers\BudgetController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CashFlowController;
 use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\DashboardController;
@@ -28,6 +29,9 @@ Route::middleware(['auth'])->group(function () {
         '/dashboard',
         [DashboardController::class, 'index']
     )->name('dashboard');
+
+    // -- Calendar -- //
+    Route::resource('calendar', CalendarController::class);
 });
 
 // admin access only

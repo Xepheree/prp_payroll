@@ -3,6 +3,7 @@ import {
     Banknote,
     Building2,
     BusFront,
+    Calendar,
     CalendarCheck,
     Clipboard,
     HandCoins,
@@ -93,6 +94,11 @@ export function AppSidebar() {
     ];
 
     const footerNavItems: NavItem[] = [
+        {
+            title: 'Calendar',
+            href: '/calendar',
+            icon: Calendar,
+        },
         ...(isAdmin
             ? [
                   {

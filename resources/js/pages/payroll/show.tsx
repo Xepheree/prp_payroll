@@ -35,6 +35,7 @@ import { Input } from '@/components/ui/input';
 import { exportPayslip } from '@/lib/pdf/payslip';
 import { FileText } from 'lucide-react';
 import { exportBatchPayslips } from '@/lib/pdf/batchPayslip';
+import { exportDenomination } from '@/lib/pdf/denomination';
 
 interface PayrollItem {
     id: number;
@@ -149,17 +150,33 @@ export default function Show() {
                             Finalize Payroll
                         </Button>
                     ) : (
-                        <Button
-                            onClick={() =>
-                                exportBatchPayslips(
-                                    items,
-                                    payroll.start_date,
-                                    payroll.end_date,
-                                )
-                            }
-                        >
-                            Print Payslips
-                        </Button>
+                        <div className="flex gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() =>
+                                    exportDenomination(
+                                        items,
+                                        payroll.start_date,
+                                        payroll.end_date,
+                                    )
+                                }
+                            >
+                                <FileText className="mr-2 h-4 w-4" />
+                                Print Denomination
+                            </Button>
+
+                            <Button
+                                onClick={() =>
+                                    exportBatchPayslips(
+                                        items,
+                                        payroll.start_date,
+                                        payroll.end_date,
+                                    )
+                                }
+                            >
+                                Print Payslips
+                            </Button>
+                        </div>
                     )}
                 </div>
 
