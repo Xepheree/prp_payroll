@@ -32,6 +32,7 @@ import {
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Attendance {
     id: number;
@@ -183,109 +184,90 @@ export default function Show() {
                         </div>
                     </CardHeader>
 
-                    <CardContent>
-                        <div className="overflow-x-auto">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead className="border-r">
-                                            Employee
-                                        </TableHead>
+                    <CardContent className="p-0">
+                        <ScrollArea className="h-[70vh] w-full">
+                            <div
+                                className="grid"
+                                style={{
+                                    gridTemplateColumns: `240px repeat(${dates.length}, minmax(80px, 1fr))`,
+                                }}
+                            >
+                                <div className="sticky top-0 left-0 z-30 border-r border-b bg-background p-3 font-semibold">
+                                    Employee
+                                </div>
+                                {dates.map((date) => (
+                                    <div
+                                        key={date}
+                                        className="sticky top-0 z-20 border-r border-b bg-background p-2 text-center"
+                                    >
+                                        <div className="font-semibold">
+                                            {format(new Date(date), 'EEE')}
+                                        </div>
 
-                                        {dates.map((date) => (
-                                            <TableHead
-                                                key={date}
-                                                className="border-r text-center"
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className="text-lg">
-                                                        {format(
-                                                            new Date(date),
-                                                            'EEE',
-                                                        )}
-                                                    </span>
-                                                    <span className="pb-1 text-xs text-muted-foreground">
-                                                        {format(
-                                                            new Date(date),
-                                                            'MMM-dd',
-                                                        )}
-                                                    </span>
-                                                </div>
-                                            </TableHead>
-                                        ))}
-                                    </TableRow>
-                                </TableHeader>
-
-                                <TableBody>
-                                    {filteredEmployees.map((employee) => (
-                                        <TableRow key={employee.id}>
-                                            <TableCell className="border-r font-medium">
+                                        <div className="text-xs text-muted-foreground">
+                                            {format(new Date(date), 'MMM dd')}
+                                        </div>
+                                    </div>
+                                ))}
+                                {filteredEmployees.map((employee) => (
+                                    <>
+                                        <div
+                                            key={`employee-${employee.id}`}
+                                            className="sticky left-0 z-10 border-r border-b bg-background p-3"
+                                        >
+                                            <div className="font-medium">
                                                 {employee.name}
+                                            </div>
 
-                                                <div className="text-xs text-muted-foreground">
-                                                    {employee.designation}
+                                            <div className="text-xs text-muted-foreground">
+                                                {employee.designation}
+                                            </div>
+                                        </div>
+
+                                        {dates.map((date) => {
+                                            const itemId =
+                                                employee.attendance[date]?.id;
+
+                                            const currentValue = Number(
+                                                attendanceData[itemId] ?? 0,
+                                            );
+
+                                            return (
+                                                <div
+                                                    key={date}
+                                                    className="border-r border-b p-2"
+                                                >
+                                                    <Input
+                                                        disabled={is_locked}
+                                                        type="number"
+                                                        min="0"
+                                                        max="24"
+                                                        step="0.5"
+                                                        value={currentValue}
+                                                        style={getAttendanceStyle(
+                                                            currentValue,
+                                                        )}
+                                                        className="w-full max-w-xs text-center"
+                                                        onChange={(e) => {
+                                                            if (!itemId) return;
+
+                                                            setAttendanceData(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    [itemId]:
+                                                                        e.target
+                                                                            .value,
+                                                                }),
+                                                            );
+                                                        }}
+                                                    />
                                                 </div>
-                                            </TableCell>
-
-                                            {dates.map((date) => {
-                                                const itemId =
-                                                    employee.attendance[date]
-                                                        ?.id;
-                                                const currentValue = Number(
-                                                    attendanceData[itemId] ?? 0,
-                                                );
-
-                                                return (
-                                                    <TableCell
-                                                        key={date}
-                                                        className="border-r text-center"
-                                                    >
-                                                        <Input
-                                                            onFocus={(e) => {
-                                                                requestAnimationFrame(
-                                                                    () => {
-                                                                        e.target.select();
-                                                                    },
-                                                                );
-                                                            }}
-                                                            disabled={is_locked}
-                                                            type="number"
-                                                            min="0"
-                                                            max="24"
-                                                            step="0.5"
-                                                            style={getAttendanceStyle(
-                                                                currentValue,
-                                                            )}
-                                                            className={
-                                                                'w-16 border text-center'
-                                                            }
-                                                            value={currentValue}
-                                                            onFocus={(e) =>
-                                                                e.target.select()
-                                                            }
-                                                            onChange={(e) => {
-                                                                if (!itemId)
-                                                                    return;
-
-                                                                setAttendanceData(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        [itemId]:
-                                                                            e
-                                                                                .target
-                                                                                .value,
-                                                                    }),
-                                                                );
-                                                            }}
-                                                        />
-                                                    </TableCell>
-                                                );
-                                            })}
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
+                                            );
+                                        })}
+                                    </>
+                                ))}
+                            </div>
+                        </ScrollArea>
                     </CardContent>
                 </Card>
             </div>
