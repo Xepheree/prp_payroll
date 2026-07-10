@@ -46,18 +46,24 @@ class CompaniesController extends Controller
 
         Company::create([
             'image' => $imagePath,
-
             'name' => $request->name,
-
             'specialization' => $request->specialization,
 
-            'contact_person_name' => $request->contact_person_name,
+            'contact_person_name' => $request->filled('contact_person_name')
+                ? $request->contact_person_name
+                : null,
 
-            'contact_person_number' => $request->contact_person_number,
+            'contact_person_number' => $request->filled('contact_person_number')
+                ? $request->contact_person_number
+                : null,
 
-            'address' => $request->address,
+            'address' => $request->filled('address')
+                ? $request->address
+                : null,
 
-            'details' => $request->details,
+            'details' => $request->filled('details')
+                ? $request->details
+                : null,
         ]);
 
         return redirect()
