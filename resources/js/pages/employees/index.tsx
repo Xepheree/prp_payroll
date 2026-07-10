@@ -68,38 +68,49 @@ export default function Index() {
                 </div>
 
                 <Card>
-                    {/* <CardHeader>
-                        <CardTitle></CardTitle>
-                    </CardHeader> */}
+                    <CardContent className="p-0">
+                        <div className="max-h-[70vh] overflow-auto">
+                            <table className="w-full border-collapse">
+                                <thead className="sticky top-0 z-50 bg-background">
+                                    <tr>
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            #
+                                        </th>
 
-                    <CardContent>
-                        {employees.length === 0 ? (
-                            <EmptyState
-                                title="No Employees Registered"
-                                description="Register employees to get started."
-                                actionLabel="Add Employee"
-                                onAction={() => setOpenCreate(true)}
-                            />
-                        ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>#</TableHead>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Designation</TableHead>
-                                        <TableHead>Rate</TableHead>
-                                        <TableHead>OT Rate</TableHead>
-                                        <TableHead>Trip Rate</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead className="w-[150px]">
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            Name
+                                        </th>
+
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            Designation
+                                        </th>
+
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            Rate
+                                        </th>
+
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            OT Rate
+                                        </th>
+
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            Trip Rate
+                                        </th>
+
+                                        <th className="border-b bg-background px-4 py-3 text-left">
+                                            Status
+                                        </th>
+
+                                        <th className="border-b bg-background px-4 py-3 text-left">
                                             Actions
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
+                                        </th>
+                                    </tr>
+                                </thead>
 
-                                <TableBody>
+                                <tbody>
                                     {[...employees].map((employee, index) => (
                                         <EmployeeRow
+                                            key={employee.id}
                                             employee={employee}
                                             index={index}
                                             handleRowClick={handleRowClick}
@@ -107,12 +118,11 @@ export default function Index() {
                                                 setEditingEmployee
                                             }
                                             setOpenCreate={setOpenCreate}
-                                            key={employee.id}
                                         />
                                     ))}
-                                </TableBody>
-                            </Table>
-                        )}
+                                </tbody>
+                            </table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

@@ -33,7 +33,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { exportPayslip } from '@/lib/pdf/payslip';
-import { FileText } from 'lucide-react';
+import { FileText, PhilippinePeso } from 'lucide-react';
 import { exportBatchPayslips } from '@/lib/pdf/batchPayslip';
 import { exportDenomination } from '@/lib/pdf/denomination';
 
@@ -81,6 +81,21 @@ export default function Show() {
 
     const totalPayroll = items.reduce(
         (total, item) => total + Number(item.net_pay),
+        0,
+    );
+
+    const totalBasicPay = items.reduce(
+        (total, item) => total + Number(item.basic_pay),
+        0,
+    );
+
+    const totalTripPay = items.reduce(
+        (total, item) => total + Number(item.trip_pay),
+        0,
+    );
+
+    const totalGrossPay = items.reduce(
+        (total, item) => total + Number(item.gross_pay),
         0,
     );
 
@@ -231,262 +246,321 @@ export default function Show() {
                         <CardTitle>Employee Payroll</CardTitle>
                     </CardHeader>
 
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="border-r">
-                                        Employee
-                                    </TableHead>
+                    <CardContent className="p-0">
+                        <div className="max-h-[70vh] overflow-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <TableRow>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background">
+                                            Employee
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Days
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Days
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Hours
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Hours
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        OT
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            OT
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        OT Pay
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            OT Pay
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Trips
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Trips
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Trip Pay
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Trip Pay
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Gross
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Basic Pay
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Outstanding
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Gross
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Recover
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Outstanding
+                                        </TableHead>
 
-                                    <TableHead className="border-r text-center">
-                                        Salary Released
-                                    </TableHead>
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Recover
+                                        </TableHead>
 
-                                    {/* <TableHead>Net Pay</TableHead> */}
+                                        <TableHead className="sticky top-0 z-50 border-r bg-background text-center">
+                                            Net Pay
+                                        </TableHead>
 
-                                    {payroll.status === 'finalized' && (
-                                        <TableHead>Actions</TableHead>
-                                    )}
-                                </TableRow>
-                            </TableHeader>
+                                        {payroll.status === 'finalized' && (
+                                            <TableHead className="sticky top-0 z-50 bg-background">
+                                                Actions
+                                            </TableHead>
+                                        )}
+                                    </TableRow>
+                                </thead>
 
-                            <TableBody>
-                                {items.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="border-r font-medium">
-                                            {item.employee.name}
+                                <TableBody>
+                                    {items.map((item) => (
+                                        <TableRow key={item.id}>
+                                            <TableCell className="border-r font-medium">
+                                                {item.employee.name}
 
-                                            <div className="text-xs text-muted-foreground">
-                                                {`${
-                                                    item.employee.designation
-                                                        .charAt(0)
-                                                        .toUpperCase() +
-                                                    item.employee.designation.slice(
-                                                        1,
-                                                    )
-                                                } @ ₱${Number(item.employee.rate)} /day`}
-                                            </div>
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            {Number(
-                                                item.days_worked,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            {Number(
-                                                item.work_hours,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            {Number(
-                                                item.overtime_hours,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            ₱
-                                            {Number(
-                                                item.overtime_pay,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            {item.delivery_count}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            ₱
-                                            {Number(
-                                                item.trip_pay,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            ₱
-                                            {Number(
-                                                item.gross_pay,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            ₱
-                                            {Number(
-                                                item.outstanding_balance,
-                                            ).toLocaleString()}
-                                        </TableCell>
-
-                                        <TableCell className="border-r text-center">
-                                            <TableCell className="text-center">
-                                                {payroll.status === 'draft' ? (
-                                                    <Input
-                                                        className="border-r text-center"
-                                                        type="number"
-                                                        placeholder="0"
-                                                        min={0}
-                                                        max={Math.min(
-                                                            Number(
-                                                                item.outstanding_balance,
-                                                            ),
-                                                            Number(
-                                                                item.net_pay,
-                                                            ),
-                                                        )}
-                                                        value={
-                                                            balanceRecoveries[
-                                                                item.employee.id
-                                                            ] ?? ''
-                                                        }
-                                                        // onChange={(e) => {
-                                                        //     const value =
-                                                        //         Number(
-                                                        //             e.target
-                                                        //                 .value,
-                                                        //         );
-
-                                                        //     setBalanceRecoveries(
-                                                        //         (current) => ({
-                                                        //             ...current,
-                                                        //             [item
-                                                        //                 .employee
-                                                        //                 .id]:
-                                                        //                 Math.min(
-                                                        //                     Math.max(
-                                                        //                         value,
-                                                        //                         0,
-                                                        //                     ),
-                                                        //                     Math.min(
-                                                        //                         Number(
-                                                        //                             item.outstanding_balance,
-                                                        //                         ),
-                                                        //                         Number(
-                                                        //                             item.net_pay,
-                                                        //                         ),
-                                                        //                     ),
-                                                        //                 ),
-                                                        //         }),
-                                                        //     );
-                                                        // }}
-
-                                                        onChange={(e) => {
-                                                            const value =
-                                                                Number(
-                                                                    e.target
-                                                                        .value,
-                                                                );
-
-                                                            console.log(
-                                                                'changed',
-                                                                item.employee
-                                                                    .id,
-                                                                value,
-                                                            );
-
-                                                            setBalanceRecoveries(
-                                                                (current) => ({
-                                                                    ...current,
-                                                                    [item
-                                                                        .employee
-                                                                        .id]:
-                                                                        value,
-                                                                }),
-                                                            );
-                                                        }}
-                                                    />
-                                                ) : (
-                                                    <div className="text-center">
-                                                        ₱
-                                                        {Number(
-                                                            item.balance_recovery,
-                                                        ).toLocaleString()}
-                                                    </div>
-                                                )}
+                                                <div className="text-xs text-muted-foreground">
+                                                    {`${
+                                                        item.employee.designation
+                                                            .charAt(0)
+                                                            .toUpperCase() +
+                                                        item.employee.designation.slice(
+                                                            1,
+                                                        )
+                                                    } @ ₱${Number(item.employee.rate)} /day`}
+                                                </div>
                                             </TableCell>
-                                        </TableCell>
 
-                                        <TableCell className="border-r text-center">
-                                            ₱
-                                            {payroll.status === 'draft'
-                                                ? (
-                                                      Number(item.net_pay) -
-                                                      (balanceRecoveries[
-                                                          item.employee.id
-                                                      ] ?? 0)
-                                                  ).toLocaleString()
-                                                : Number(
-                                                      item.salary_released,
-                                                  ).toLocaleString()}
-                                        </TableCell>
+                                            <TableCell className="border-r text-center">
+                                                {Number(
+                                                    item.days_worked,
+                                                ).toLocaleString()}
+                                            </TableCell>
 
-                                        {/* <TableCell className="font-medium">
+                                            <TableCell className="border-r text-center">
+                                                {Number(
+                                                    item.work_hours,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                {Number(
+                                                    item.overtime_hours,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                ₱
+                                                {Number(
+                                                    item.overtime_pay,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                {item.delivery_count}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                ₱
+                                                {Number(
+                                                    item.trip_pay,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                ₱
+                                                {Number(
+                                                    item.basic_pay,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                ₱
+                                                {Number(
+                                                    item.gross_pay,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                ₱
+                                                {Number(
+                                                    item.outstanding_balance,
+                                                ).toLocaleString()}
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                <TableCell className="text-center">
+                                                    {payroll.status ===
+                                                    'draft' ? (
+                                                        <div className="flex items-center justify-center gap-1">
+                                                            <PhilippinePeso className="h-4 w-4" />
+                                                            <Input
+                                                                className="w-20 border-r text-center"
+                                                                type="number"
+                                                                placeholder="0"
+                                                                min={0}
+                                                                max={Math.min(
+                                                                    Number(
+                                                                        item.outstanding_balance,
+                                                                    ),
+                                                                    Number(
+                                                                        item.net_pay,
+                                                                    ),
+                                                                )}
+                                                                value={
+                                                                    balanceRecoveries[
+                                                                        item
+                                                                            .employee
+                                                                            .id
+                                                                    ] ?? ''
+                                                                }
+                                                                // onChange={(e) => {
+                                                                //     const value =
+                                                                //         Number(
+                                                                //             e.target
+                                                                //                 .value,
+                                                                //         );
+
+                                                                //     setBalanceRecoveries(
+                                                                //         (current) => ({
+                                                                //             ...current,
+                                                                //             [item
+                                                                //                 .employee
+                                                                //                 .id]:
+                                                                //                 Math.min(
+                                                                //                     Math.max(
+                                                                //                         value,
+                                                                //                         0,
+                                                                //                     ),
+                                                                //                     Math.min(
+                                                                //                         Number(
+                                                                //                             item.outstanding_balance,
+                                                                //                         ),
+                                                                //                         Number(
+                                                                //                             item.net_pay,
+                                                                //                         ),
+                                                                //                     ),
+                                                                //                 ),
+                                                                //         }),
+                                                                //     );
+                                                                // }}
+
+                                                                onChange={(
+                                                                    e,
+                                                                ) => {
+                                                                    const value =
+                                                                        Number(
+                                                                            e
+                                                                                .target
+                                                                                .value,
+                                                                        );
+
+                                                                    console.log(
+                                                                        'changed',
+                                                                        item
+                                                                            .employee
+                                                                            .id,
+                                                                        value,
+                                                                    );
+
+                                                                    setBalanceRecoveries(
+                                                                        (
+                                                                            current,
+                                                                        ) => ({
+                                                                            ...current,
+                                                                            [item
+                                                                                .employee
+                                                                                .id]:
+                                                                                value,
+                                                                        }),
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="text-center">
+                                                            ₱
+                                                            {Number(
+                                                                item.balance_recovery,
+                                                            ).toLocaleString()}
+                                                        </div>
+                                                    )}
+                                                </TableCell>
+                                            </TableCell>
+
+                                            <TableCell className="border-r text-center">
+                                                ₱
+                                                {payroll.status === 'draft'
+                                                    ? (
+                                                          Number(item.net_pay) -
+                                                          (balanceRecoveries[
+                                                              item.employee.id
+                                                          ] ?? 0)
+                                                      ).toLocaleString()
+                                                    : Number(
+                                                          item.salary_released,
+                                                      ).toLocaleString()}
+                                            </TableCell>
+
+                                            {/* <TableCell className="font-medium">
                                             ₱
                                             {Number(
                                                 item.net_pay,
                                             ).toLocaleString()}
                                         </TableCell> */}
 
+                                            {payroll.status === 'finalized' && (
+                                                <TableCell>
+                                                    <div className="flex gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="icon"
+                                                            onClick={() =>
+                                                                exportPayslip(
+                                                                    item,
+                                                                    payroll.start_date,
+                                                                    payroll.end_date,
+                                                                )
+                                                            }
+                                                        >
+                                                            <FileText className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            )}
+                                        </TableRow>
+                                    ))}
+
+                                    <TableRow className="bg-muted/30 font-semibold">
+                                        <TableCell className="border-r">
+                                            Totals
+                                        </TableCell>
+
+                                        <TableCell className="border-r" />
+                                        <TableCell className="border-r" />
+                                        <TableCell className="border-r" />
+                                        <TableCell className="border-r" />
+                                        <TableCell className="border-r" />
+
+                                        <TableCell className="border-r text-center">
+                                            ₱{totalTripPay.toLocaleString()}
+                                        </TableCell>
+
+                                        <TableCell className="border-r text-center">
+                                            ₱{totalBasicPay.toLocaleString()}
+                                        </TableCell>
+
+                                        <TableCell className="border-r text-center">
+                                            ₱{totalGrossPay.toLocaleString()}
+                                        </TableCell>
+
+                                        <TableCell className="border-r" />
+                                        <TableCell className="border-r" />
+                                        <TableCell className="border-r">
+                                            ₱{totalPayroll.toLocaleString()}
+                                        </TableCell>
+
                                         {payroll.status === 'finalized' && (
-                                            <TableCell>
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        variant="outline"
-                                                        size="icon"
-                                                        onClick={() =>
-                                                            exportPayslip(
-                                                                item,
-                                                                payroll.start_date,
-                                                                payroll.end_date,
-                                                            )
-                                                        }
-                                                    >
-                                                        <FileText className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            </TableCell>
+                                            <TableCell />
                                         )}
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableBody>
+                            </table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
