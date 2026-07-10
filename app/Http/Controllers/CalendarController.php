@@ -32,6 +32,36 @@ class CalendarController extends Controller
 
         CalendarEvent::create($validated);
 
-        return back();
+        return back()->with(
+            'success',
+            'Event created successfully.'
+        );
+    }
+
+    public function update(Request $request, CalendarEvent $calendar)
+    {
+        $validated = $request->validate([
+            'date' => ['required', 'date'],
+            'title' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+            'color' => ['required', 'string'],
+        ]);
+
+        $calendar->update($validated);
+
+        return back()->with(
+            'success',
+            'Event updated successfully.'
+        );
+    }
+
+    public function destroy(CalendarEvent $calendar)
+    {
+        $calendar->delete();
+
+        return back()->with(
+            'success',
+            'Event deleted successfully.'
+        );
     }
 }
