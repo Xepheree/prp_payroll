@@ -23,7 +23,7 @@ import { toast } from 'sonner';
 import { formatDate } from '@/lib/utils';
 
 export default function Index() {
-    const { trips, filters, employees, trucks, flash } = usePage()
+    const { trips, filters, employees, trucks, companies, flash } = usePage()
         .props as PageProps;
 
     const [dateFilters, setDateFilters] = useState({
@@ -151,6 +151,10 @@ export default function Index() {
                                             </TableHead>
 
                                             <TableHead className="border-r">
+                                                Company
+                                            </TableHead>
+
+                                            <TableHead className="border-r">
                                                 Type
                                             </TableHead>
 
@@ -160,6 +164,10 @@ export default function Index() {
 
                                             <TableHead className="border-r">
                                                 Helper
+                                            </TableHead>
+
+                                            <TableHead className="border-r">
+                                                Remarks
                                             </TableHead>
 
                                             <TableHead>Actions</TableHead>
@@ -185,6 +193,10 @@ export default function Index() {
                                                     {trip.truck?.alias}
                                                 </TableCell>
 
+                                                <TableCell className="border-r">
+                                                    {trip.company?.name ?? '-'}
+                                                </TableCell>
+
                                                 <TableCell className="border-r capitalize">
                                                     {trip.trip_type}
                                                 </TableCell>
@@ -195,6 +207,16 @@ export default function Index() {
 
                                                 <TableCell className="border-r">
                                                     {trip.helper?.name ?? '-'}
+                                                </TableCell>
+
+                                                <TableCell className="max-w-xs border-r">
+                                                    <p
+                                                        className="truncate"
+                                                        title={trip.description}
+                                                    >
+                                                        {trip.description ||
+                                                            '-'}
+                                                    </p>
                                                 </TableCell>
 
                                                 <TableCell>
@@ -344,6 +366,7 @@ export default function Index() {
                 }}
                 employees={employees}
                 trucks={trucks}
+                companies={companies}
                 trip={editingTrip}
             />
 

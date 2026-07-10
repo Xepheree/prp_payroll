@@ -15,4 +15,9 @@ class Company extends Model
         'address',
         'details',
     ];
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
 }

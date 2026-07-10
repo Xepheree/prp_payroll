@@ -148,6 +148,9 @@ function CreateEmployeeModal({
         'guard',
         'hr',
         'finance',
+        'forkliftdriver',
+        'cook',
+        'admin',
     ];
 
     return (

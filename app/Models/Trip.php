@@ -13,11 +13,14 @@ class Trip extends Model
     protected $fillable = [
         'trip_date',
         'truck_id',
+        'company_id',
         'driver_id',
         'helper_id',
         'trip_type',
+        'description',
         'employee_paid',
         'status',
+        'payroll_id',
     ];
 
     public function truck()
@@ -33,6 +36,11 @@ class Trip extends Model
     public function helper()
     {
         return $this->belongsTo(Employee::class, 'helper_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 
     public function payroll()

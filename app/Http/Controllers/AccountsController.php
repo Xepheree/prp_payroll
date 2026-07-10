@@ -42,6 +42,7 @@ class AccountsController extends Controller
 
     public function store(Request $request)
     {
+        // Validate the request data
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'profile_picture' => [
@@ -60,7 +61,7 @@ class AccountsController extends Controller
             ],
         ]);
 
-
+        // Handle profile picture upload if present
         if ($request->hasFile('profile_picture')) {
 
             $validated['profile_picture'] = $request
@@ -68,6 +69,7 @@ class AccountsController extends Controller
                 ->store('profiles', 'public');
         }
 
+        // Create the user account
         User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
@@ -77,6 +79,7 @@ class AccountsController extends Controller
 
         ]);
 
+        // Redirect to the accounts index page with a success message
         return redirect()
             ->route('accounts.index')
             ->with('success', 'Account created successfully.');

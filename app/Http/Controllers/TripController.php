@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\Employee;
 use App\Models\Payroll;
 use App\Models\Trip;
@@ -19,6 +20,7 @@ class TripController extends Controller
             'truck',
             'driver',
             'helper',
+            'company',
             'payroll',
         ]);
 
@@ -42,6 +44,7 @@ class TripController extends Controller
             'breadcrumbs' => [
                 ['title' => 'Trips', 'href' => '/trips'],
             ],
+            'companies' => Company::orderBy('created_at', 'asc')->get(),
             'trips' => $trips
                 ->latest('trip_date')
                 ->get()
@@ -78,28 +81,23 @@ class TripController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'trip_date' => 'required|date',
-
-            'truck_id' => 'required|exists:trucks,id',
-
-            'driver_id' => 'required|exists:employees,id',
-
-            'helper_id' => 'nullable|exists:employees,id',
-
-            'trip_type' => 'required|in:deliver,pickup,transfer,backload',
-
+            'trip_date' => ['required', 'date'],
+            'truck_id' => ['required', 'exists:trucks,id'],
+            'company_id' => ['nullable', 'exists:companies,id'],
+            'driver_id' => ['required', 'exists:employees,id'],
+            'helper_id' => ['nullable', 'exists:employees,id'],
+            'trip_type' => ['required', 'in:deliver,pickup,transfer,backload'],
+            'description' => ['nullable', 'string'],
         ]);
 
         Trip::create([
             'trip_date' => $request->trip_date,
-
             'truck_id' => $request->truck_id,
-
+            'company_id' => $request->company_id,
             'driver_id' => $request->driver_id,
-
             'helper_id' => $request->helper_id,
-
             'trip_type' => $request->trip_type,
+            'description' => $request->description,
         ]);
 
         return redirect()
@@ -117,10 +115,21 @@ class TripController extends Controller
 
         $validated = $request->validate([
             'trip_date' => ['required', 'date'],
+
             'truck_id' => ['required', 'exists:trucks,id'],
+
+            'company_id' => ['nullable', 'exists:companies,id'],
+
             'driver_id' => ['required', 'exists:employees,id'],
+
             'helper_id' => ['nullable', 'exists:employees,id'],
-            'trip_type' => ['required', 'in:pickup,transfer,deliver'],
+
+            'trip_type' => [
+                'required',
+                'in:deliver,pickup,transfer,backload',
+            ],
+
+            'description' => ['nullable', 'string'],
         ]);
 
         $trip->update($validated);

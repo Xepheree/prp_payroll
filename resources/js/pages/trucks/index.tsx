@@ -20,7 +20,7 @@ import EmptyState from '@/components/custom/EmptyState';
 
 export default function Index() {
     const { trucks, flash } = usePage().props as PageProps;
-
+    const [editingTruck, setEditingTruck] = useState(null);
     const [selectedTruck, setSelectedTruck] = useState(null);
     const [open, setOpen] = useState(false);
 
@@ -58,7 +58,12 @@ export default function Index() {
                     </div>
 
                     {trucks.length !== 0 && (
-                        <Button onClick={() => setOpenCreate(true)}>
+                        <Button
+                            onClick={() => {
+                                setEditingTruck(null);
+                                setOpenCreate(true);
+                            }}
+                        >
                             <Plus className="mr-2 h-4 w-4" />
                             Add Truck
                         </Button>
@@ -76,7 +81,10 @@ export default function Index() {
                                 title="No Trucks Registered"
                                 description="Register trucks to get started."
                                 actionLabel="Add Truck"
-                                onAction={() => setOpenCreate(true)}
+                                onAction={() => {
+                                    setEditingTruck(null);
+                                    setOpenCreate(true);
+                                }}
                             />
                         ) : (
                             <Table>
@@ -148,6 +156,13 @@ export default function Index() {
                                                             variant="outline"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+
+                                                                setEditingTruck(
+                                                                    truck,
+                                                                );
+                                                                setOpenCreate(
+                                                                    true,
+                                                                );
                                                             }}
                                                         >
                                                             <Pencil className="h-4 w-4" />
@@ -185,7 +200,14 @@ export default function Index() {
 
             <CreateTruckModal
                 openCreate={openCreate}
-                setOpenCreate={setOpenCreate}
+                setOpenCreate={(open) => {
+                    setOpenCreate(open);
+
+                    if (!open) {
+                        setEditingTruck(null);
+                    }
+                }}
+                truck={editingTruck}
             />
         </>
     );

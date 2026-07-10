@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,10 +22,13 @@ import {
 function CreateTruckModal({
     openCreate,
     setOpenCreate,
+    truck = null,
 }: {
     openCreate: boolean;
-    setOpenCreate: any;
+    setOpenCreate: (open: boolean) => void;
+    truck?: any;
 }) {
+    const isEditing = !!truck;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [form, setForm] = useState<{
         image: File | null;
@@ -42,6 +45,27 @@ function CreateTruckModal({
         category: '',
         status: 'ready',
     });
+
+    useEffect(() => {
+        if (truck) {
+            setForm({
+                image: null,
+                plate: truck.plate ?? '',
+                alias: truck.alias ?? '',
+                make: truck.make ?? '',
+                category: truck.category ?? '',
+                status: truck.status ?? 'ready',
+            });
+
+            setImagePreview(
+                truck.image
+                    ? `/storage/${truck.image}`
+                    : '/images/truck_placeholder.png',
+            );
+        } else {
+            resetState();
+        }
+    }, [truck]);
 
     const resetState = () => {
         setForm({
@@ -71,6 +95,31 @@ function CreateTruckModal({
 
         if (form.image) {
             data.append('image', form.image);
+        }
+
+        if (isEditing) {
+            data.append('_method', 'PUT');
+
+            router.post(`/trucks/${truck.id}`, data, {
+                forceFormData: true,
+
+                onSuccess: () => {
+                    toast.success('Truck updated successfully');
+
+                    resetState();
+                    setOpenCreate(false);
+                },
+
+                onError: (errors) => {
+                    const firstError = Object.values(errors)[0];
+
+                    if (firstError) {
+                        toast.error(firstError as string);
+                    }
+                },
+            });
+
+            return;
         }
 
         router.post('/trucks', data, {
@@ -109,7 +158,9 @@ function CreateTruckModal({
             >
                 <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-xl">
                     <DialogHeader>
-                        <DialogTitle>Add Truck</DialogTitle>
+                        <DialogTitle>
+                            {isEditing ? 'Edit Truck' : 'Add Truck'}
+                        </DialogTitle>
                     </DialogHeader>
 
                     <div className="grid max-h-[65vh] gap-4 overflow-y-auto py-4">
@@ -269,7 +320,9 @@ function CreateTruckModal({
                             Cancel
                         </Button>
 
-                        <Button onClick={submit}>Save Truck</Button>
+                        <Button onClick={submit}>
+                            {isEditing ? 'Update Truck' : 'Save Truck'}
+                        </Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

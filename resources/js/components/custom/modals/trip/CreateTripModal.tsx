@@ -26,20 +26,24 @@ function CreateTripModal({
     setOpenCreate,
     employees,
     trucks,
+    companies,
     trip = null,
 }: {
     openCreate: boolean;
     setOpenCreate: (open: boolean) => void;
     employees: any[];
     trucks: any[];
+    companies: any[];
     trip?: any;
 }) {
     const [form, setForm] = useState({
         trip_date: '',
         truck_id: '',
+        company_id: '',
         driver_id: '',
         helper_id: 'none',
         trip_type: '',
+        description: '',
     });
     const isEditing = !!trip;
 
@@ -47,9 +51,11 @@ function CreateTripModal({
         setForm({
             trip_date: '',
             truck_id: '',
+            company_id: '',
             driver_id: '',
             helper_id: 'none',
             trip_type: '',
+            description: '',
         });
     };
 
@@ -101,9 +107,11 @@ function CreateTripModal({
             setForm({
                 trip_date: trip.trip_date ?? '',
                 truck_id: String(trip.truck_id ?? ''),
+                company_id: String(trip.company_id ?? ''),
                 driver_id: String(trip.driver_id ?? ''),
                 helper_id: trip.helper_id ? String(trip.helper_id) : 'none',
                 trip_type: trip.trip_type ?? '',
+                description: trip.description ?? '',
             });
         } else {
             resetState();
@@ -167,6 +175,35 @@ function CreateTripModal({
                                         value={String(truck.id)}
                                     >
                                         {truck.plate} - {truck.alias}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Company</Label>
+
+                        <Select
+                            value={form.company_id}
+                            onValueChange={(value) =>
+                                setForm({
+                                    ...form,
+                                    company_id: value,
+                                })
+                            }
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select Company" />
+                            </SelectTrigger>
+
+                            <SelectContent>
+                                {companies.map((company) => (
+                                    <SelectItem
+                                        key={company.id}
+                                        value={String(company.id)}
+                                    >
+                                        {company.name}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -267,6 +304,22 @@ function CreateTripModal({
                                 </SelectItem>
                             </SelectContent>
                         </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label>Remarks</Label>
+
+                        <Textarea
+                            rows={4}
+                            placeholder="Optional remarks..."
+                            value={form.description}
+                            onChange={(e) =>
+                                setForm({
+                                    ...form,
+                                    description: e.target.value,
+                                })
+                            }
+                        />
                     </div>
                 </div>
 

@@ -49,6 +49,71 @@ class TrucksController extends Controller
         return redirect()->route('trucks.index')->with('message', 'Truck added successfully.');
     }
 
+    public function update(Request $request, Truck $truck)
+    {
+        $validated = $request->validate([
+            'image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:20240',
+            ],
+
+            'plate' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'alias' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'make' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'category' => [
+                'required',
+                'string',
+                'max:255',
+            ],
+
+            'status' => [
+                'required',
+                'string',
+            ],
+        ]);
+
+        if (!$request->hasFile('image')) {
+            unset($validated['image']);
+        }
+
+        if ($request->hasFile('image')) {
+
+            if (
+                $truck->image &&
+                basename($truck->image) !== 'truck_placeholder.png'
+            ) {
+                Storage::disk('public')->delete($truck->image);
+            }
+
+            $validated['image'] = $request
+                ->file('image')
+                ->store('trucks', 'public');
+        }
+
+        $truck->update($validated);
+
+        return redirect()
+            ->route('trucks.index')
+            ->with('success', 'Truck updated successfully.');
+    }
+
     public function destroy(Truck $truck)
     {
         if (
