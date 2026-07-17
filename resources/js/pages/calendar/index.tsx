@@ -5,13 +5,6 @@ import {
     endOfMonth,
     endOfWeek,
     format,
-<<<<<<< HEAD
-    isSameDay,
-    isSameMonth,
-    startOfMonth,
-    startOfWeek,
-    subMonths,
-=======
     getDate,
     getDay,
     getMonth,
@@ -27,7 +20,6 @@ import {
     differenceInCalendarMonths,
     getWeekOfMonth,
     lastDayOfMonth,
->>>>>>> ad5c97e (Add the completed Calendar module)
 } from 'date-fns';
 import { ChevronLeft, ChevronRight, Edit, Trash } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -59,11 +51,9 @@ import {
 } from '@/components/ui/select';
 
 import { Textarea } from '@/components/ui/textarea';
-<<<<<<< HEAD
-=======
+
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
->>>>>>> ad5c97e (Add the completed Calendar module)
 
 export default function Calendar() {
     const [currentDate, setCurrentDate] = useState(new Date());
@@ -199,39 +189,6 @@ export default function Calendar() {
         }
     };
 
-<<<<<<< HEAD
-    const selectedEvents =
-        selectedDate === null
-            ? []
-            : events.filter(
-                  (event: any) =>
-                      event.date === format(selectedDate, 'yyyy-MM-dd'),
-              );
-
-    const [editingEvent, setEditingEvent] = useState<any | null>(null);
-    const [openDelete, setOpenDelete] = useState(false);
-    const [eventToDelete, setEventToDelete] = useState<any | null>(null);
-
-    const saveEvent = () => {
-        if (editingEvent) {
-            router.put(`/calendar/${editingEvent.id}`, data, {
-                onSuccess: () => {
-                    toast.success('Event updated successfully.');
-                    setCreatingEvent(false);
-                    setEditingEvent(null);
-                },
-            });
-        } else {
-            post('/calendar', {
-                onSuccess: () => {
-                    toast.success('Event created successfully.');
-                    setCreatingEvent(false);
-                },
-            });
-        }
-    };
-
-=======
     const isLastWeekOfMonth = (date: Date) => {
         return getWeekOfMonth(date) === getWeekOfMonth(lastDayOfMonth(date));
     };
@@ -363,7 +320,6 @@ export default function Calendar() {
         { label: 'Employee', value: 'employee' },
     ];
 
->>>>>>> ad5c97e (Add the completed Calendar module)
     return (
         <>
             <div className="space-y-6 p-6">
@@ -428,9 +384,6 @@ export default function Calendar() {
                                     setData({
                                         title: '',
                                         description: '',
-<<<<<<< HEAD
-                                        color: 'blue',
-=======
 
                                         start_date: format(day, 'yyyy-MM-dd'),
                                         end_date: format(day, 'yyyy-MM-dd'),
@@ -454,7 +407,6 @@ export default function Calendar() {
                                         week_of_month: 1,
 
                                         day_of_week: 0,
->>>>>>> ad5c97e (Add the completed Calendar module)
                                     });
                                 }}
                                 key={day.toISOString()}
@@ -523,145 +475,6 @@ export default function Calendar() {
                                         </p>
                                     </div>
                                 ) : (
-<<<<<<< HEAD
-                                    <div className="space-y-2">
-                                        {selectedEvents.map((event: any) => (
-                                            <div
-                                                key={event.id}
-                                                className={`flex flex-col rounded-lg px-2 py-2 ${
-                                                    colorClasses[
-                                                        event.color as keyof typeof colorClasses
-                                                    ] ??
-                                                    'bg-gray-500 text-white'
-                                                }`}
-                                            >
-                                                <div className="flex items-center justify-between">
-                                                    <div className="pl-3">
-                                                        {event.title}
-                                                    </div>
-                                                    <div className="space-x-1">
-                                                        <Button
-                                                            size="xs"
-                                                            className="bg-blue-300 text-background hover:bg-blue-400"
-                                                            onClick={() => {
-                                                                setEditingEvent(
-                                                                    event,
-                                                                );
-                                                                setCreatingEvent(
-                                                                    true,
-                                                                );
-
-                                                                setData({
-                                                                    date: event.date,
-                                                                    title: event.title,
-                                                                    description:
-                                                                        event.description ??
-                                                                        '',
-                                                                    color: event.color,
-                                                                });
-                                                            }}
-                                                        >
-                                                            <Edit className="h-4 w-4" />
-                                                        </Button>
-                                                        <Button
-                                                            size="xs"
-                                                            className="bg-red-300 text-background hover:bg-red-400"
-                                                            onClick={() => {
-                                                                setEventToDelete(
-                                                                    event,
-                                                                );
-                                                                setOpenDelete(
-                                                                    true,
-                                                                );
-                                                            }}
-                                                        >
-                                                            <Trash className="h-4 w-4" />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-
-                                                {event.description && (
-                                                    <div className="pl-3 text-xs text-muted">
-                                                        {event.description}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                <Button
-                                    className="mt-4 w-full"
-                                    onClick={() => {
-                                        setEditingEvent(null);
-                                        setCreatingEvent(true);
-
-                                        setData({
-                                            date: format(
-                                                selectedDate!,
-                                                'yyyy-MM-dd',
-                                            ),
-                                            title: '',
-                                            description: '',
-                                            color: 'blue',
-                                        });
-                                    }}
-                                >
-                                    Add Event
-                                </Button>
-                            </>
-                        </>
-                    ) : (
-                        <>
-                            <Input
-                                value={data.title}
-                                onChange={(e) =>
-                                    setData('title', e.target.value)
-                                }
-                                placeholder="Event title"
-                            />
-
-                            <Select
-                                value={data.color}
-                                onValueChange={(value) =>
-                                    setData('color', value)
-                                }
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select a color" />
-                                </SelectTrigger>
-
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {colors.map((color) => (
-                                            <SelectItem
-                                                key={color.value}
-                                                value={color.value}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <div
-                                                        className={`h-3 w-3 rounded-full bg-${color.value}-500`}
-                                                    />
-                                                    {color.label}
-                                                </div>
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-
-                            <Textarea
-                                value={data.description}
-                                onChange={(e) =>
-                                    setData('description', e.target.value)
-                                }
-                                placeholder="Description"
-                            />
-
-                            <Button onClick={saveEvent}>
-                                {editingEvent ? 'Update' : 'Save'}
-                            </Button>
-=======
                                     <div className="space-y-3">
                                         {selectedEvents.map((event: any) => (
                                             <div
@@ -1349,7 +1162,6 @@ export default function Calendar() {
                                         : 'Create Event'}
                                 </Button>
                             </div>
->>>>>>> ad5c97e (Add the completed Calendar module)
                         </>
                     )}
                 </DialogContent>

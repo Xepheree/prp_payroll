@@ -150,7 +150,7 @@ class CalendarController extends Controller
         );
     }
 
-    public function update(Request $request, CalendarEvent $calendar)
+    public function update(Request $request)
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -220,46 +220,9 @@ class CalendarController extends Controller
             $validated['day_of_week'] = null;
         }
 
-<<<<<<< HEAD
         return back()->with(
             'success',
             'Event created successfully.'
-        );
-    }
-
-    public function update(Request $request, CalendarEvent $calendar)
-    {
-        $validated = $request->validate([
-            'date' => ['required', 'date'],
-            'title' => ['required', 'string'],
-            'description' => ['nullable', 'string'],
-            'color' => ['required', 'string'],
-        ]);
-
-        $calendar->update($validated);
-=======
-        $permissions = $validated['permissions'] ?? [];
-
-        unset($validated['permissions']);
-
-        DB::transaction(function () use ($calendar, $validated, $permissions) {
-
-            $calendar->update($validated);
-
-            $calendar->permissions()->delete();
-
-            if (
-                $validated['visibility'] === 'custom' &&
-                !empty($permissions)
-            ) {
-                $calendar->permissions()->createMany($permissions);
-            }
-        });
->>>>>>> ad5c97e (Add the completed Calendar module)
-
-        return back()->with(
-            'success',
-            'Event updated successfully.'
         );
     }
 
