@@ -1,4 +1,6 @@
 import { router, useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
@@ -16,8 +18,6 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import type { User } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { useState } from 'react';
-import axios from 'axios';
 import TemporaryPasswordDialog from './TemporaryPasswordDialog';
 
 type Props = {
