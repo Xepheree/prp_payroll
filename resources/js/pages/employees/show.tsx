@@ -15,9 +15,13 @@ import {
 } from '@/pages/employees';
 
 export default function Show() {
-    const { employee } = usePage().props as {
+    const { employee, filters } = usePage<{
         employee: Employee;
-    };
+        filters: {
+            start_date?: string;
+            end_date?: string;
+        };
+    }>().props;
     console.log(employee);
 
     return (
@@ -141,7 +145,7 @@ export default function Show() {
                     </TabsList>
 
                     <TabsContent value="transactions">
-                        <TransactionTab employee={employee} />
+                        <TransactionTab employee={employee} filters={filters} />
                     </TabsContent>
 
                     <TabsContent value="driven">

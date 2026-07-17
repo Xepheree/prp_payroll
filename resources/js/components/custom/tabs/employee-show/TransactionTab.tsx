@@ -1,4 +1,6 @@
+import { router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
     Table,
     TableHeader,
@@ -9,7 +11,13 @@ import {
 } from '@/components/ui/table';
 import { formatDateTime } from '@/lib/utils';
 
-function TransactionTab({ employee }: { employee: any }) {
+function TransactionTab({
+    employee,
+    filters,
+}: {
+    employee: any;
+    filters: any;
+}) {
     return (
         <Card>
             <CardHeader>
@@ -17,6 +25,58 @@ function TransactionTab({ employee }: { employee: any }) {
             </CardHeader>
 
             <CardContent>
+                <div className="mb-4 flex gap-4">
+                    <div>
+                        <label className="mb-1 block text-sm font-medium">
+                            Start Date
+                        </label>
+
+                        <Input
+                            type="date"
+                            value={filters?.start_date ?? ''}
+                            onChange={(e) =>
+                                router.get(
+                                    window.location.pathname,
+                                    {
+                                        start_date: e.target.value,
+                                        end_date: filters?.end_date,
+                                    },
+                                    {
+                                        preserveState: true,
+                                        preserveScroll: true,
+                                        replace: true,
+                                    },
+                                )
+                            }
+                        />
+                    </div>
+
+                    <div>
+                        <label className="mb-1 block text-sm font-medium">
+                            End Date
+                        </label>
+
+                        <Input
+                            type="date"
+                            value={filters?.end_date ?? ''}
+                            onChange={(e) =>
+                                router.get(
+                                    window.location.pathname,
+                                    {
+                                        start_date: filters?.start_date,
+                                        end_date: e.target.value,
+                                    },
+                                    {
+                                        preserveState: true,
+                                        preserveScroll: true,
+                                        replace: true,
+                                    },
+                                )
+                            }
+                        />
+                    </div>
+                </div>
+
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -41,13 +101,13 @@ function TransactionTab({ employee }: { employee: any }) {
                                     <TableCell
                                         className={
                                             Number(transaction.amount) < 0
-                                                ? 'font-medium text-red-400'
-                                                : 'font-medium text-green-400'
+                                                ? 'font-medium text-green-400'
+                                                : 'font-medium text-red-400'
                                         }
                                     >
                                         {Number(transaction.amount) > 0
-                                            ? '+ '
-                                            : '- '}
+                                            ? '- '
+                                            : '+ '}
                                         ₱
                                         {Math.abs(
                                             Number(transaction.amount),

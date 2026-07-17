@@ -24,15 +24,26 @@ class EmployeeController extends Controller
         return Inertia::render('employees/create', []);
     }
 
-    public function show(Employee $employee)
+    public function show(Request $request, Employee $employee)
     {
         $employee->load([
             'drivenTrips.truck',
             'assistedTrips.truck',
             'payrollItems.payroll',
             'deductions',
-            'transactions',
         ]);
+
+        $transactions = $employee->transactions()
+            ->when($request->filled('start_date'), function ($query) use ($request) {
+                $query->whereDate('created_at', '>=', $request->start_date);
+            })
+            ->when($request->filled('end_date'), function ($query) use ($request) {
+                $query->whereDate('created_at', '<=', $request->end_date);
+            })
+            ->latest()
+            ->get();
+
+        $employee->setRelation('transactions', $transactions);
 
         return Inertia::render('employees/show', [
             'breadcrumbs' => [
@@ -41,6 +52,11 @@ class EmployeeController extends Controller
             ],
 
             'employee' => $employee,
+
+            'filters' => [
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+            ],
         ]);
     }
 

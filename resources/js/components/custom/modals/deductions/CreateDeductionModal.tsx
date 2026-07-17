@@ -104,6 +104,15 @@ function CreateDeductionModal({
         }
     }, [deduction]);
 
+    const deductionTypes = [
+        'cash_advance',
+        'tax',
+        'benefits',
+        'store',
+        'damaged_property',
+        'others',
+    ];
+
     return (
         <Dialog
             open={openCreate}
@@ -169,17 +178,15 @@ function CreateDeductionModal({
                             </SelectTrigger>
 
                             <SelectContent>
-                                <SelectItem value="cash_advance">
-                                    Cash Advance
-                                </SelectItem>
-
-                                <SelectItem value="tax">Tax</SelectItem>
-
-                                <SelectItem value="benefits">
-                                    Benefits
-                                </SelectItem>
-
-                                <SelectItem value="others">Others</SelectItem>
+                                {deductionTypes.map((type) => (
+                                    <SelectItem key={type} value={type}>
+                                        {type
+                                            .replaceAll('_', ' ')
+                                            .replace(/^./, (char) =>
+                                                char.toUpperCase(),
+                                            )}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>

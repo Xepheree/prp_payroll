@@ -91,7 +91,8 @@ class DeductionController extends Controller
 
             'type' => [
                 'required',
-                'in:cash_advance,tax,benefits,others',
+                'string',
+                'max:255',
             ],
 
             'date' => [
@@ -112,10 +113,6 @@ class DeductionController extends Controller
             ->whereDate('end_date', '>=', $deduction->date)
             ->exists();
 
-        $filingStatus = $coveredByPayroll
-            ? 'Late Filing'
-            : 'Early Filing';
-
         EmployeeTransaction::create([
             'employee_id' => $deduction->employee_id,
 
@@ -125,8 +122,8 @@ class DeductionController extends Controller
 
             'description' => sprintf(
                 '%s - %s',
-                $filingStatus,
-                str_replace('_', ' ', $deduction->type)
+                ucwords(str_replace('_', ' ', $deduction->type)),
+                $deduction->date->format('M d, Y')
             ),
 
             'deduction_id' => $deduction->id,
@@ -225,10 +222,6 @@ class DeductionController extends Controller
             ->whereDate('end_date', '>=', $deduction->date)
             ->exists();
 
-        $filingStatus = $coveredByPayroll
-            ? 'Late Filing'
-            : 'Early Filing';
-
         EmployeeTransaction::create([
             'employee_id' => $deduction->employee_id,
 
@@ -236,11 +229,9 @@ class DeductionController extends Controller
 
             'amount' => $deduction->amount,
 
-            'description' => sprintf(
-                '%s - %s',
-                $filingStatus,
-                str_replace('_', ' ', $deduction->type)
-            ),
+            'description' => ucwords(str_replace('_', ' ', $deduction->type))
+                . ' - '
+                . $deduction->date->format('M d, Y'),
 
             'deduction_id' => $deduction->id,
         ]);
